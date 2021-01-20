@@ -1,0 +1,14 @@
+/lsp/
+build/
+/.gradle/
+.DS_Store
+# ignore .idea with exception
+.idea/*
+# enable codestyle, with save actions
+!.idea/codeStyles
+!.idea/saveactions_settings.xml
+# enable checkstyle ide
+!.idea/checkstyle-idea.xml
+!.idea/sonarlint.xml
+# copyright header
+!.idea/copyright

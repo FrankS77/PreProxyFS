@@ -1,0 +1,257 @@
+[
+  {
+    "name": "com.github.markusbernhardt.proxy.selector.pac.PacScriptMethods",
+    "allPublicMethods": true,
+    "allPublicConstructors": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "com.github.markusbernhardt.proxy.selector.pac.ScriptMethods",
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "delight.rhinosandox.internal.RhinoEvalDummy",
+    "methods": [{ "name": "eval", "parameterTypes": ["java.lang.String"] }]
+  },
+  { "name": "java.io.ObjectInputStream" },
+  { "name": "java.io.ObjectOutputStream" },
+  { "name": "java.lang.Boolean" },
+  { "name": "java.lang.Byte" },
+  { "name": "java.lang.Character" },
+  { "name": "java.lang.Class" },
+  { "name": "java.lang.Double" },
+  { "name": "java.lang.Float" },
+  { "name": "java.lang.Integer" },
+  { "name": "java.lang.Long" },
+  { "name": "java.lang.Number" },
+  { "name": "java.lang.Object" },
+  { "name": "java.lang.Short" },
+  {
+    "name": "java.lang.String",
+    "allPublicMethods": true,
+    "allPublicConstructors": true,
+    "allPublicFields": true
+  },
+  { "name": "java.util.Date" },
+  { "name": "org.mozilla.javascript.Context" },
+  { "name": "org.mozilla.javascript.ContextFactory" },
+  { "name": "org.mozilla.javascript.Function" },
+  {
+    "name": "org.mozilla.javascript.ImporterTopLevel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.mozilla.javascript.Interpreter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.mozilla.javascript.JavaAdapter",
+    "methods": [
+      {
+        "name": "readAdapterObject",
+        "parameterTypes": [
+          "org.mozilla.javascript.Scriptable",
+          "java.io.ObjectInputStream"
+        ]
+      },
+      {
+        "name": "writeAdapterObject",
+        "parameterTypes": ["java.lang.Object", "java.io.ObjectOutputStream"]
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.mozilla.javascript.NativeContinuation",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.mozilla.javascript.NativeError",
+    "methods": [
+      {
+        "name": "getStackDelegated",
+        "parameterTypes": ["org.mozilla.javascript.Scriptable"]
+      },
+      {
+        "name": "setStackDelegated",
+        "parameterTypes": [
+          "org.mozilla.javascript.Scriptable",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "put",
+        "parameterTypes": [
+          "java.lang.String",
+          "org.mozilla.javascript.Scriptable",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+    {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "put",
+        "parameterTypes": [
+          "int",
+          "org.mozilla.javascript.Scriptable",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+      {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "has",
+        "parameterTypes": [
+          "int",
+          "org.mozilla.javascript.Scriptable"
+        ]
+      }
+    ]
+  },
+        {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "get",
+        "parameterTypes": [
+          "int",
+          "org.mozilla.javascript.Scriptable"
+        ]
+      }
+    ]
+  },
+        {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "has",
+        "parameterTypes": [
+          "java.lang.String",
+          "org.mozilla.javascript.Scriptable"
+        ]
+      }
+    ]
+  },
+        {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "setParentScope",
+        "parameterTypes": [
+          "org.mozilla.javascript.Scriptable"
+        ]
+      }
+    ]
+  },
+          {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "hasInstance",
+        "parameterTypes": [
+          "org.mozilla.javascript.Scriptable"
+        ]
+      }
+    ]
+  },
+    {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "setPrototype",
+        "parameterTypes": [
+          "org.mozilla.javascript.Scriptable"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.mozilla.javascript.Scriptable",
+    "methods": [
+      {
+        "name": "get",
+        "parameterTypes": [
+          "java.lang.String",
+          "org.mozilla.javascript.Scriptable"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.mozilla.javascript.NativeError$ProtoProps",
+    "methods": [
+      {
+        "name": "getPrepareStackTrace",
+        "parameterTypes": ["org.mozilla.javascript.Scriptable"]
+      },
+      {
+        "name": "getStackTraceLimit",
+        "parameterTypes": ["org.mozilla.javascript.Scriptable"]
+      },
+      {
+        "name": "setPrepareStackTrace",
+        "parameterTypes": [
+          "org.mozilla.javascript.Scriptable",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "setStackTraceLimit",
+        "parameterTypes": [
+          "org.mozilla.javascript.Scriptable",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.mozilla.javascript.NativeJavaTopPackage",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.mozilla.javascript.ScriptableObject",
+    "methods": [{ "name": "getExternalArrayLength", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.mozilla.javascript.jdk18.VMBridge_jdk18",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  { "name": "org.mozilla.javascript.optimizer.Codegen" },
+  {
+    "name": "org.mozilla.javascript.regexp.NativeRegExp",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.mozilla.javascript.regexp.RegExpImpl",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.mozilla.javascript.xmlimpl.XMLLibImpl",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.w3c.dom.Node",
+    "methods": [
+      { "name": "getUserData", "parameterTypes": ["java.lang.String"] }
+    ]
+  }
+]

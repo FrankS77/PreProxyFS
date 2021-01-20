@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "suppressions_1_2.dtd">
+
+<suppressions>
+    <suppress files="[\\/]OnlyExample[\\/]" checks="[a-zA-Z0-9]*"/>
+
+</suppressions>
