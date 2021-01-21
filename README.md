@@ -35,7 +35,7 @@ delight-rhino-sandbox (https://github.com/javadelight/delight-rhino-sandbox) and
 # Mandatory: Local proxy port. Must be a free local post. Default 65000
 MAIN_LOCAL_PORT = 65000
 # Mandatory: Path or URL to PAC script e.g. http://my.pac.server/remote.pac or /home/myuser/mypac.pac (windows c:/mypac.pac)
-PAC_URL = src/test/resources/Test.pac
+PAC_URL = http://my.pac.server/remote.pac
 # Optional: Password basic authentication for a proxy/proxies in PAC script [<proxyDNSname>:<ProxyPort>[[<myUserName>][<myPassword>]]]
 #           Attention: If there is a square bracket [ or ] in your password, please use &#91; for left square bracket [  and use  &#93; for right square bracket
 USER_PASSWORD_MAP = [remote.proxy1.com:8080[[myUserName][myPassword]]][remote.proxy2.com:8080[[myUserName2][myPassword2]]]
