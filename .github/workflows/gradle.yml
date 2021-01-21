@@ -23,21 +23,21 @@ jobs:
         run: ./gradlew distZip
       - name: Get version and set env
         run: |
-              echo "::set-env name=VERSION::$(./gradlew -q getVersion)"
+              echo "preproxyfsversion=$(./gradlew -q getVersion)"  >> $GITHUB_ENV
       - name: 'Publish zip release'
         uses: actions/upload-artifact@v2
         with:
-          path: build/distributions/PreProxyFS-${{env.VERSION}}.zip
+          path: build/distributions/PreProxyFS-${{env.preproxyfsversion}}.zip
       - name: 'Create Release'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
-          tag_name: ${{env.VERSION}}
-          release_name: Release ${{env.VERSION}}
+          tag_name: ${{env.preproxyfsversion}}
+          release_name: Release ${{env.preproxyfsversion}}
           body: |
-            Release ${{env.VERSION}}
+            Release ${{env.preproxyfsversion}}
           draft: false
           prerelease: false
       - name: 'Upload Release Asset'
@@ -47,6 +47,6 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
-          asset_path: build/distributions/PreProxyFS-${{env.VERSION}}.zip
-          asset_name: PreProxyFS-${{env.VERSION}}.zip
+          asset_path: build/distributions/PreProxyFS-${{env.preproxyfsversion}}.zip
+          asset_name: PreProxyFS-${{env.preproxyfsversion}}.zip
           asset_content_type: application/zip
