@@ -3,7 +3,6 @@ package de.fschullerer.preproxyfs.it;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-
 import com.github.markusbernhardt.proxy.selector.pac.JavaxPacScriptParser;
 import com.github.markusbernhardt.proxy.selector.pac.ProxyEvaluationException;
 import de.fschullerer.preproxyfs.DirectForwardServer;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 
 @ExtendWith(MockitoExtension.class)
 class DistributionServerIT {
@@ -39,7 +37,7 @@ class DistributionServerIT {
         // create DistributeServer for tests
         DistributeServer distributeServer = new DistributeServer(0);
         distributeServer.start();
-        
+
         // this will be a DIRECT connection, mock a DirectForwardServer
         // and set port to the proxy helper thread port
         // DistributeServer will then send DIRECT request to that port

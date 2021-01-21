@@ -401,7 +401,9 @@ public class PreProxyFS {
      */
     public static void main(String[] args) {
         if (args.length == 0) {
-            LOGGER.error("PreProxyFS needs as parameter the the full path to the PreProxyFS.properties file");
+            LOGGER.error("PreProxyFS needs as parameter the full path to the PreProxyFS.properties file!");
+            LOGGER.error("Call PreProxyFS script like e.g. (Linux) sh PreProxyFS /path/to/PreProxyFS.properties ");
+            LOGGER.error("for e.g. (Windows) PreProxyFS.bat c:/path/to/PreProxyFS.properties ");
         } else {
             settingsFilePath = args[0];
             // read settings file

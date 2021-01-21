@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 
-
 import com.github.markusbernhardt.proxy.selector.pac.JavaxPacScriptParser;
 import com.github.markusbernhardt.proxy.selector.pac.ProxyEvaluationException;
 import de.fschullerer.preproxyfs.DirectForwardServer;
@@ -148,7 +147,7 @@ class DistributionForwardClientThreadTest {
 
     @Test
     @Tag("UnitTest")
-    @DisplayName("DS007: Assert that basic authentication is added for Http request " 
+    @DisplayName("DS007: Assert that basic authentication is added for Http request "
             + "for startForwardServerThreadForHttpRequest.")
     void testNonHttpRequestWithStartForwardThread() throws ProxyEvaluationException, IOException {
         MockSocket sock = new MockSocket();
