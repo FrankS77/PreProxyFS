@@ -96,17 +96,10 @@ task sourcesJar(type: Jar, dependsOn:classes) {
     }
 }
 
-task libZip(type: Zip) {
-    println 'dependencies are zipped to build/distributions/lib.zip'
-    from configurations.compileClasspath
-    archiveName 'lib.zip'
-}
-
 // by default, implementation cannot be referenced,
 // this allows us to use it below
 project.configurations.implementation.setCanBeResolved(true)
 jar {
-    // dependsOn libZip
     dependsOn sourcesJar
     doFirst {
         manifest {
@@ -187,6 +180,12 @@ def getOS() {
             break;
     }
     return os
+}
+
+task getVersion() {
+    doLast {
+        println project.version
+    }
 }
 
 /**
