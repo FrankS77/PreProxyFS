@@ -23,7 +23,7 @@ jobs:
         run: ./gradlew distZip
       - name: Get version and set env
         run: |
-              echo "::set-env name=VERSION::$(./gradlew -q getVersion)
+              echo "::set-env name=VERSION::$(./gradlew -q getVersion)"
       - name: 'Publish zip release'
         uses: actions/upload-artifact@v2
         with:
