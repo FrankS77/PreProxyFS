@@ -22,7 +22,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew distZip
       - name: 'Publish zip release'
-      - uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: PreProxyFS
           path: build/distributions/PreProxyFS*.zip
