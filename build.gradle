@@ -5,41 +5,44 @@
  * For more details take a look at the Java Libraries chapter in the Gradle
  * User Manual available at https://docs.gradle.org/6.3/userguide/java_library_plugin.html
  */
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
-	id 'application'
+    id 'application'
     id 'java-library'
     id 'org.ajoberstar.grgit' version '1.7.2'
     id 'org.mikeneck.graalvm-native-image' version 'v1.0.2'
-	id 'name.remal.sonarlint' version '1.2.2'
-	id 'checkstyle'
+    id 'name.remal.sonarlint' version '1.2.2'
+    id 'checkstyle'
+    id 'jacoco'
+    id 'distribution'
 }
 
-
 application {
-    mainClass = "de.fschullerer.preproxyfs.PreProxyFS"
+    mainClass = 'de.fschullerer.preproxyfs.PreProxyFS'
 }
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
-	
+
 repositories {
-  	mavenCentral()
+    mavenCentral()
     jcenter()
 }
 
 dependencies {
-	implementation "org.slf4j:slf4j-simple:1.7.30"
-	implementation "org.slf4j:slf4j-api:1.7.30"
-	implementation ('org.javadelight:delight-rhino-sandbox:0.0.13') {
-		transitive = false
-	}
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation ('org.javadelight:delight-rhino-sandbox:0.0.13') {
+        transitive = false
+    }
     implementation 'org.mozilla:rhino:1.7.13'
-    // not use proxy-vole > 1.0.4, we want to use the rhino not nashorn engine 
-	implementation ("com.github.markusbernhardt:proxy-vole:1.0.4") {
-		transitive = false
-	}
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.0'
+    // not use proxy-vole > 1.0.4, we want to use the rhino not nashorn engine
+    implementation ('com.github.markusbernhardt:proxy-vole:1.0.4') {
+        transitive = false
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     testImplementation 'org.junit.platform:junit-platform-runner:1.7.0'
     testImplementation 'org.junit.platform:junit-platform-suite-api:1.7.0'
@@ -47,28 +50,44 @@ dependencies {
     testImplementation 'org.assertj:assertj-core:3.18.1'
 }
 
-test {
-    useJUnitPlatform()
+jacocoTestReport {
+    dependsOn test
 }
 
-def getRepositoryVersion(){
-	def version = ""
-	try {
-		def latestCommitDate = grgit.log(maxCommits: 1).get(0).date
-		version = latestCommitDate.format('yyyy-MM-dd_HH-mm')
-	} catch (all) {
-		version = "1.0"
-	}
-	return version
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+check.dependsOn jacocoTestCoverageVerification
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.3
+            }
+        }
+    }
+}
+
+def getRepositoryVersion() {
+    def version = ''
+    try {
+        def latestCommitDate = grgit.log(maxCommits: 1).get(0).date
+        version = latestCommitDate.format('yyyy-MM-dd')
+    } catch (all) {
+        version = '1.0'
+    }
+    return version
 }
 
 version = getRepositoryVersion()
 group   = 'de.fschullerer'
 
 tasks.withType(JavaCompile) {
-	options.encoding = javaEncoding
+    options.encoding = javaEncoding
 }
-	
+
 task sourcesJar(type: Jar, dependsOn:classes) {
     from sourceSets.main.java
     archiveClassifier = 'sources'
@@ -78,16 +97,16 @@ task sourcesJar(type: Jar, dependsOn:classes) {
 }
 
 task libZip(type: Zip) {
-    println "dependencies are zipped to build/distributions/lib.zip"
+    println 'dependencies are zipped to build/distributions/lib.zip'
     from configurations.compileClasspath
     archiveName 'lib.zip'
 }
 
-// by default, implementation cannot be referenced, 
+// by default, implementation cannot be referenced,
 // this allows us to use it below
 project.configurations.implementation.setCanBeResolved(true)
 jar {
-    dependsOn libZip
+    // dependsOn libZip
     dependsOn sourcesJar
     doFirst {
         manifest {
@@ -98,49 +117,85 @@ jar {
                     'Built-Host': java.net.InetAddress.getLocalHost().getHostName(),
                     'Source-Compatibility': project.sourceCompatibility,
                     'Target-Compatibility': project.targetCompatibility,
-                    'Build-Time': new Date().format("yyyy-MM-dd_HH-mm"),
-                    'Class-Path': configurations.compileClasspath.collect { "lib/" + it.name }.join(' ')
+                    'Build-Time': new Date().format('yyyy-MM-dd_HH-mm'),
+                    'Class-Path': configurations.compileClasspath.collect { 'lib/' + it.name }.join(' ')
         }
     }
 }
 
-	sonarlint {
-		// https://remal.gitlab.io/gradle-plugins/plugins/name.remal.sonarlint/
-		// fail for sonarlint issues 
-		ignoreFailures = false
+sonarlint {
+    // https://remal.gitlab.io/gradle-plugins/plugins/name.remal.sonarlint/
+    // fail for sonarlint issues
+    ignoreFailures = false
     excludes {
         message 'java:S1135'
     }
-	}
-	
-   checkstyle {
-        toolVersion '8.38'
-        ignoreFailures = false
-        maxErrors = 0
-        maxWarnings = 0
-       configDirectory = rootProject.file('src/main/resources/checkstyle')
-    }
-    
-    checkstyleMain {
-    source ='src/main/java'
 }
-	
+
+checkstyle {
+    toolVersion '8.38'
+    ignoreFailures = false
+    maxErrors = 0
+    maxWarnings = 0
+    configDirectory = rootProject.file('src/main/resources/checkstyle')
+}
+
+checkstyleMain {
+    source = 'src/main/java'
+}
+
 nativeImage {
-  // Attention: JAVA_HOME must be a GraalVM!
-  graalVmHome = System.getProperty('java.home')
-  mainClass = 'de.fschullerer.preproxyfs.PreProxyFS'
-  executableName = 'PreProxyFS'
-  outputDirectory = file("$buildDir/bin")
-  arguments {
-    add '--no-fallback'
-    add '--enable-all-security-services'
-    add '--allow-incomplete-classpath'
-    add '--enable-url-protocols=http'
-    add '--report-unsupported-elements-at-runtime'
-  }
+    // Attention: JAVA_HOME must be a GraalVM!
+    graalVmHome = System.getProperty('java.home')
+    mainClass = 'de.fschullerer.preproxyfs.PreProxyFS'
+    executableName = 'PreProxyFS'
+    outputDirectory = file("$buildDir/bin")
+    arguments {
+        add '--no-fallback'
+        add '--enable-all-security-services'
+        add '--allow-incomplete-classpath'
+        add '--enable-url-protocols=http'
+        add '--report-unsupported-elements-at-runtime'
+    }
 }
 
 generateNativeImageConfig {
-  enabled = false
-  byRunningApplicationWithoutArguments() 
-  }
+    enabled = false
+    byRunningApplicationWithoutArguments()
+}
+
+distributions {
+    main {
+        contents {
+            from 'README.md'
+            from 'PreProxyFSexample.properties'
+        }
+    }
+}
+
+def getOS() {
+    def os
+    switch (OperatingSystem.current()) {
+        case OperatingSystem.LINUX:
+            os = "Linux";
+            break;
+        case OperatingSystem.MAC_OS:
+            os = "macOS";
+            break;
+        case OperatingSystem.WINDOWS:
+            pos = "Windows";
+            break;
+    }
+    return os
+}
+
+/**
+ * Generate native image for distribution in a zip file.
+ */
+task packageDistribution(dependsOn: ['nativeImage'],type: Zip) {
+     archiveFileName = "${project.name}-" + getOS() + "-" + getRepositoryVersion() +".zip"
+     destinationDirectory = file("${project.buildDir}/distributions")
+     from file("${project.buildDir}/bin")
+     from file("README.md")
+     from file("PreProxyFSexample.properties")
+}
