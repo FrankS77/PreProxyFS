@@ -22,9 +22,12 @@ jobs:
           - os: windows-latest
             gu-binary: gu
     steps:
+      - uses: actions/checkout@v2
       - name: Setup Graalvm
         id: setup-graalvm
         uses: DeLaGuardo/setup-graalvm@master
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
           graalvm-version: '21.0.0.java11'
       - name: Install native-image component
