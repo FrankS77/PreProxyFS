@@ -50,11 +50,22 @@ jobs:
         run: |
            $pver = (./gradlew.bat -q getVersion) -join "`n"; Write-Output  ("pversion=$pver") | Out-File -FilePath $Env:GITHUB_ENV -Append
         if: runner.os == 'Windows'
-
       - name: 'Publish zip release'
         uses: actions/upload-artifact@v2
         with:
           path: build/distributions/PreProxyFS-${{env.osname}}-${{env.pversion}}.zip
+      - name: 'Create Release'
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          with:
+            tag_name: ${{env.pversion}}
+            release_name: Release ${{env.pversion}}
+            body: |
+              Release ${{env.pversion}}
+            draft: false
+            prerelease: false
       - name: 'Upload Release Asset'
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
