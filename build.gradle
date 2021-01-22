@@ -176,7 +176,7 @@ def getOS() {
             os = "macOS";
             break;
         case OperatingSystem.WINDOWS:
-            pos = "Windows";
+            os = "Windows";
             break;
     }
     return os
@@ -185,6 +185,12 @@ def getOS() {
 task getVersion() {
     doLast {
         println project.version
+    }
+}
+
+task printOS() {
+    doLast {
+        println "" + getOS()
     }
 }
 
