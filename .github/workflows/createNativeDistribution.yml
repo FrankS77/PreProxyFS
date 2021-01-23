@@ -27,7 +27,8 @@ jobs:
       - name: 'Publish zip release'
         uses: actions/upload-artifact@v2
         with:
-          path: build/distributions/PreProxyFS-Jar-${{env.preproxyfsversion}}.zip
+          path: build/distributions/PreProxyFS-${{env.preproxyfsversion}}.zip
+          if-no-files-found: error
       - name: 'Create Release'
         id: create_release
         uses: actions/create-release@v1
@@ -47,8 +48,8 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
-          asset_path: build/distributions/PreProxyFS-Jar-${{env.preproxyfsversion}}.zip
-          asset_name: PreProxyFS-${{env.preproxyfsversion}}.zip
+          asset_path: build/distributions/PreProxyFS-${{env.preproxyfsversion}}.zip
+          asset_name: PreProxyFS-Jar-${{env.preproxyfsversion}}.zip
           asset_content_type: application/zip
 
 
@@ -100,6 +101,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: build/distributions/PreProxyFS-${{runner.os}}-${{env.pversion}}.zip
+          if-no-files-found: error
       - name: 'Upload release asset'
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
