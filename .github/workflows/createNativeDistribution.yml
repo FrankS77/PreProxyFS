@@ -1,14 +1,59 @@
-name: PreProxyFS native distribution for multiple operating systems
+name: PreProxyFS Jar distribution - create release
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - "v*"
 
 jobs:
-  build:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew distZip
+      - name: Get version and set env
+        run: |
+          echo "preproxyfsversion=$(./gradlew -q getVersion)"  >> $GITHUB_ENV
+      - name: 'Publish zip release'
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/distributions/PreProxyFS-Jar-${{env.preproxyfsversion}}.zip
+      - name: 'Create Release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: ${{env.preproxyfsversion}}
+          release_name: Release ${{env.preproxyfsversion}}
+          body: |
+            Release ${{env.preproxyfsversion}}
+          draft: false
+          prerelease: false
+      - name: 'Upload Release Asset'
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}}
+          asset_path: build/distributions/PreProxyFS-Jar-${{env.preproxyfsversion}}.zip
+          asset_name: PreProxyFS-${{env.preproxyfsversion}}.zip
+          asset_content_type: application/zip
 
+
+  build:
+    needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -23,6 +68,7 @@ jobs:
             gu-binary: gu
     steps:
       - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1.5.0
       - name: Setup Graalvm
         id: setup-graalvm
         uses: DeLaGuardo/setup-graalvm@master
@@ -41,38 +87,26 @@ jobs:
         if: runner.os == 'macOS' || runner.os == 'Linux'
       - name: Build with Gradle Windows
         run: ./gradlew.bat packageDistribution
-        if: runner.os == 'Windows' 
+        if: runner.os == 'Windows'
       - name: Get version and set env macOS and Linux
         run: |
-              echo "pversion=$(./gradlew -q getVersion)"  >> $GITHUB_ENV
+          echo "pversion=$(./gradlew -q getVersion)"  >> $GITHUB_ENV
         if: runner.os == 'macOS' || runner.os == 'Linux'
-      - name: Get version and set env Windows 
+      - name: Get version and set env Windows
         run: |
-           $pver = (./gradlew.bat -q getVersion) -join "`n"; Write-Output  ("pversion=$pver") | Out-File -FilePath $Env:GITHUB_ENV -Append
+          $pver = (./gradlew.bat -q getVersion) -join "`n"; Write-Output  ("pversion=$pver") | Out-File -FilePath $Env:GITHUB_ENV -Append
         if: runner.os == 'Windows'
       - name: 'Publish zip release'
         uses: actions/upload-artifact@v2
         with:
           path: build/distributions/PreProxyFS-${{runner.os}}-${{env.pversion}}.zip
-      - name: 'Create Release'
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        with:
-          tag_name: ${{env.pversion}}
-          release_name: Release ${{env.pversion}}
-          body: |
-            Release ${{env.pversion}}
-          draft: false
-          prerelease: false
       - name: 'Upload release asset'
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
-          upload_url: ${{steps.create_release.outputs.upload_url}}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: build/distributions/PreProxyFS-${{runner.os}}-${{env.pversion}}.zip
           asset_name: PreProxyFS-${{runner.os}}-${{env.pversion}}.zip
           asset_content_type: application/zip
