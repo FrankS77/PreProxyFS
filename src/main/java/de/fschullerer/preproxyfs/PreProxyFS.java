@@ -4,6 +4,9 @@ import com.github.markusbernhardt.proxy.selector.pac.JavaxPacScriptParser;
 import com.github.markusbernhardt.proxy.selector.pac.PacScriptParser;
 import com.github.markusbernhardt.proxy.selector.pac.UrlPacScriptSource;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -71,7 +74,9 @@ public class PreProxyFS {
      */
     private static String getProxyAuth(String user, String pass) {
         String userPass = user + ":" + pass;
-        return "Proxy-Authorization: Basic " + Base64.getEncoder().encodeToString(userPass.getBytes()) + "\r\n";
+        // read from settings file with utf-8
+        return "Proxy-Authorization: Basic " + Base64.getEncoder().encodeToString(userPass
+                .getBytes(StandardCharsets.UTF_8)) + "\r\n";
     }
 
     /**
@@ -105,8 +110,10 @@ public class PreProxyFS {
     private static void readSettings() {
         // Read properties file in a Property object
         Properties props = new Properties();
-        try (FileInputStream settingsFile = new FileInputStream(settingsFilePath)) {
-            props.load(settingsFile);
+        // read from settings file with utf-8
+        try (FileInputStream settingsFile = new FileInputStream(settingsFilePath); 
+             InputStreamReader in = new InputStreamReader(settingsFile, StandardCharsets.UTF_8)) {
+            props.load(in);
         } catch (Exception e) {
             throw new PreProxyFSException("Failure loading the settings file: " + settingsFilePath + " Program exit.",
                     e);
