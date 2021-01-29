@@ -121,6 +121,7 @@ sonarlint {
     // fail for sonarlint issues
     ignoreFailures = false
     excludes {
+        // exclude TODO warnings
         message 'java:S1135'
     }
 }
@@ -200,6 +201,10 @@ task printOS() {
 task packageDistribution(dependsOn: ['nativeImage'],type: Zip) {
      archiveFileName = "${project.name}-" + getOS() + "-" + getRepositoryVersion() +".zip"
      destinationDirectory = file("${project.buildDir}/distributions")
+     // exclude GraalVM generated debug files for windows
+     exclude("**/*.exp")
+     exclude("**/*.lib")
+     exclude("**/*.pdb")
      from file("${project.buildDir}/bin")
      from file("README.md")
      from file("PreProxyFSexample.properties")
