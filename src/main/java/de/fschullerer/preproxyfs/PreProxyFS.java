@@ -5,7 +5,6 @@ import com.github.markusbernhardt.proxy.selector.pac.PacScriptParser;
 import com.github.markusbernhardt.proxy.selector.pac.UrlPacScriptSource;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -56,6 +55,9 @@ public class PreProxyFS {
     private static String pacUrl;
     private static DistributeServer mainDistributionServer;
     private static DirectForwardServer directForwardServer;
+
+    private static int timeoutForProxyCheck;
+    
     /**
      * The stored/defined proxy authentications from settings file.
      */
@@ -64,7 +66,16 @@ public class PreProxyFS {
     public static void setProxyAuthenticationMap(Map<String, String[]> authMap) {
         proxyAuthenticationMap = authMap;
     }
-
+    
+    /**
+     * Get the timeout to wait for connecting to the remote proxies.
+     *
+     * @return 0 if there should be no check.
+     */
+    public static int getTimeoutForProxyCheck() {
+        return timeoutForProxyCheck;
+    }
+    
     /**
      * Base64 convert user name and password for proxy authentication.
      *
@@ -75,8 +86,8 @@ public class PreProxyFS {
     private static String getProxyAuth(String user, String pass) {
         String userPass = user + ":" + pass;
         // read from settings file with utf-8
-        return "Proxy-Authorization: Basic " + Base64.getEncoder().encodeToString(userPass
-                .getBytes(StandardCharsets.UTF_8)) + "\r\n";
+        return "Proxy-Authorization: Basic " + Base64.getEncoder()
+            .encodeToString(userPass.getBytes(StandardCharsets.UTF_8))  + "\r\n";
     }
 
     /**
@@ -84,8 +95,8 @@ public class PreProxyFS {
      * special proxy.
      *
      * @param proxy The proxy as proxyDNS:port string e.g. my.remote.proxy.com:8080
-     * @return The Base64 converted user name and password for proxy authentication.
-     *     e.g. Proxy-Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l (with line break at the end \r\n )
+     * @return The Base64 converted user name and password for proxy authentication e.g.
+     *         Proxy-Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l (with line break at the end \r\n)
      */
     static String getProxyAuthenticationForProxy(String proxy) {
         String[] userPass = null;
@@ -111,8 +122,8 @@ public class PreProxyFS {
         // Read properties file in a Property object
         Properties props = new Properties();
         // read from settings file with utf-8
-        try (FileInputStream settingsFile = new FileInputStream(settingsFilePath); 
-             InputStreamReader in = new InputStreamReader(settingsFile, StandardCharsets.UTF_8)) {
+        try (FileInputStream settingsFile = new FileInputStream(settingsFilePath);
+                InputStreamReader in = new InputStreamReader(settingsFile, StandardCharsets.UTF_8)) {
             props.load(in);
         } catch (Exception e) {
             throw new PreProxyFSException("Failure loading the settings file: " + settingsFilePath + " Program exit.",
@@ -121,13 +132,13 @@ public class PreProxyFS {
         setPacUrl(props.getProperty("PAC_URL"));
         setMainBindPort(props.getProperty("MAIN_LOCAL_PORT"));
         setUserPasswordMap(props.getProperty("USER_PASSWORD_MAP", ""));
+        setTimeoutForProxyCheck(props.getProperty("TIMEOUT_FOR_PROXY_CHECK", "0"));
     }
 
     /**
      * Setting (mandatory): Set PAC URL/file.
      *
-     * @param pacFileOrUrl e.g. http://my.proxy.domain.com/server.pac or
-     *                     file:/c:/myPac.pac
+     * @param pacFileOrUrl e.g. http://my.proxy.domain.com/server.pac or c:/myPac.pac
      */
     private static void setPacUrl(String pacFileOrUrl) {
         if (null == pacFileOrUrl || "".equals(pacFileOrUrl)) {
@@ -159,6 +170,15 @@ public class PreProxyFS {
             }
         }
     }
+    
+    private static void setTimeoutForProxyCheck(String timeout) {
+        // -1 means: do not use this feature
+        int timeoutToSet = -1;
+        if (Util.isNumeric(timeout)) {
+            timeoutToSet = Integer.parseInt(timeout);
+        }
+        timeoutForProxyCheck = timeoutToSet;
+    }
 
     /**
      * Setting (optional): Get the proxy username password combinations from
@@ -173,7 +193,7 @@ public class PreProxyFS {
             int rightSquareBracketCount = count(usersAndPassForProxies, "]");
             if ((leftSquareBracketCount < 4) || leftSquareBracketCount != rightSquareBracketCount) {
                 throw new PreProxyFSException("The configuration for USER_PASSWORD_MAP. Tip: Count "
-                        + "the square brackets [ and ] in variable. It must be 4 for each entry. Program exit.");
+                   + "the square brackets [ and ] in variable. It must be 4 for each entry. Program exit.");
             }
             List<String> tempList = new ArrayList<>();
             int indexToCut;

@@ -1,7 +1,9 @@
 package de.fschullerer.preproxyfs;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,12 +65,12 @@ public final class Util {
         }
         return url;
     }
-
+    
     /**
      * Get host name from HTTP header.
      *
      * @param request The request.
-     * @return The host name e.g. www.google.com. Or unknown.host.com if not found.
+     * @return The host name e.g. www.google.com or unknown.host.com if not found.
      */
     static String getHost(String request) {
         String host = "unknown.host.com";
@@ -126,11 +128,58 @@ public final class Util {
         return orgRequest;
     }
 
+    /**
+     * Log request/responses only if logging level "trace" is enabled.
+     *
+     * @param origin The name of the logging class (only for a better distinction).
+     * @param buffer The request or response to log.
+     */
     static void traceLogRequestResponse(String origin, byte[] buffer) {
         if (LOGGER.isTraceEnabled()) {
             // US_ASCII !!!! not UTF-8 !!
             String httpRes = new String(buffer, StandardCharsets.US_ASCII);
             LOGGER.trace("Logged request/response: {} from: {}", httpRes, origin);
         }
+    }
+
+    /**
+     * Check if given string is a number.
+     *
+     * @param toCheck The string to check.
+     * @return TRUE if string is a number.
+     */
+    public static boolean isNumeric(String toCheck) {
+        if (toCheck == null) {
+            return false;
+        }
+        return Pattern.compile("-?\\d+(\\.\\d+)?").matcher(toCheck).matches();
+    }
+
+    /**
+     * Check if remote server is reachable with timeout.
+     *
+     * @param proxyToTake The remote proxy e.g. remote.proxy.com:8080
+     * @return The proxy if it is reachable or "DIRECT" if not.
+     */
+    public static String checkIfRemoteProxyIsReachable(String proxyToTake) {
+        String proxyToTakeChecked = "DIRECT";
+        String[] proxy = proxyToTake.split(":");
+        if (proxy.length == 2) {
+            String hostName = proxy[0];
+            int port = Integer.parseInt(proxy[1]);
+            SocketAddress address = new InetSocketAddress(hostName, port);
+            Socket socket = new Socket();
+            LOGGER.trace("Try connect to host: {}", hostName);
+            try {
+                socket.connect(address, PreProxyFS.getTimeoutForProxyCheck());
+                // is alive -> TRUE
+                proxyToTakeChecked = proxyToTake;
+                socket.close();
+            } catch (IOException e) {
+                LOGGER.info("Proxy is not reachable within timeout. Try connect to remote host directly.");
+                LOGGER.trace("Unable to connect to host: {}", hostName, e);
+            }
+        }
+        return proxyToTakeChecked;
     }
 }

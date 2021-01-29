@@ -26,9 +26,10 @@ delight-rhino-sandbox (https://github.com/javadelight/delight-rhino-sandbox) and
 ## Limitations
 * Only http(s) proxies in PAC are supported (SOCKS proxies are not supported) 
 
-### Usage as a standalone program
+### Usage as a standalone Java program (see below for native executables)
 * Precondition: Minimum installed Java JRE 8
-* Download and extract the PreProxyFS zip file (the folder should contain the PreProxyFS<Version>.jar file and the lib folder). 
+* Download and extract the PreProxyFS zip file PreProxyFS-Jar-*.zip
+  (the folder should contain the PreProxyFS<Version>.jar file and the lib folder). 
 * Create a (or more) PreProxyFS.properties file. Example:
 
 ```
@@ -39,9 +40,18 @@ PAC_URL = http://my.pac.server/remote.pac
 # Optional: Password basic authentication for a proxy/proxies in PAC script [<proxyDNSname>:<ProxyPort>[[<myUserName>][<myPassword>]]]
 #           Attention: If there is a square bracket [ or ] in your password, please use &#91; for left square bracket [  and use  &#93; for right square bracket
 USER_PASSWORD_MAP = [remote.proxy1.com:8080[[myUserName][myPassword]]][remote.proxy2.com:8080[[myUserName2][myPassword2]]]
+# Optional: Check if the remote proxies (from PAC script) are reachable before forwarding the request.
+# This can be useful, if e.g. PreProxyFS is used with a VPN. If the VPN is off, PreProxyFS will forward all requests directly
+# and not via the proxies (which are not reachable if the VPN is off. 
+# Disadvantage is a a small delay, because the connection to the proxy is always tested with a timeout. This timeout
+# in milliseconds can be set. Default is 0. This means there should be no check and the connection will fail if a 
+# remote proxy is not reachable. If you set the the value too low e.g. < 20 (milliseconds) it can be that a DIRECT
+# connection is used even if the proxy is reachable but maybe your internet connection latency is a little bit too high.
+# If you set the timeout too high (e.g. 1000) you will have a noticeable delay while surfing the internet.
+TIMEOUT_FOR_PROXY_CHECK = 0
 ```
 * Put the property file somewhere in your filesystem e.g. /home/myuser/PreProxyFS.properties
-* Start PreProxyFs with: java -jar PreProxyFS*.jar /home/myuser/PreProxyFS.properties
+* Start PreProxyFs on command line with: java -jar PreProxyFS*.jar /home/myuser/PreProxyFS.properties
 * Output should be something like:
 
 ```
@@ -91,6 +101,18 @@ PreProxyFS.stopPreProxyFS();
 
 ```
 
-### Native executables (GraalVM)
-It is planned to provide native executables as download for Windows, Linux and macOS.
+### Usage as a standalone native program (Windows, macOS, Linux)
+It is also possible to download PreProxyFS specifically for your operating system.
+* Precondition: Nothing
+* Download and extract the PreProxyFS zip file 
+  PreProxyFS-Linux-*.zip for Linux;
+  PreProxyFS-macOS-*.zip for macOS;  
+  PreProxyFS-Windows-*.zip for Windows
+* Create a (or more) PreProxyFS.properties file. (see above for example)
+* Put the property file somewhere in your filesystem e.g. /home/myuser/PreProxyFS.properties
+* Start PreProxyFs on command line with: (Linux, macOS) ./PreProxyFS /home/myuser/PreProxyFS.properties
+  and for Windows: PreProxyFS.exe c:/path/to/PreProxyFS.properties
+* Output should look like (see above).
+
+
 

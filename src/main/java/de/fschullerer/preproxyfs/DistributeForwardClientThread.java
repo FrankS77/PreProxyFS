@@ -78,7 +78,11 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
     }
 
     /**
-     * Get the correct proxy for this request.
+     * Get the correct proxy for this request. It is tested if the proxy is reachable.
+     * If the proxy is not reachable, try the DIRECT connection. This is useful, if PreProxyFS
+     * is used with a VPN. If the VPN is off, PreProxyFS will forward all requests directly
+     * but always with a small delay, because the connection to the proxy is always tested with
+     * a timeout.
      *
      * @param httpReq The request converted to a string.
      * @return The proxy to take e.g. remote.proxy1.com:8080
@@ -93,6 +97,10 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
         String[] proxyInPACSplit = proxyInPAC.split(" ");
         if (proxyInPACSplit.length > 1 && "PROXY".equals(proxyInPACSplit[0])) {
             proxyToTake = proxyInPACSplit[1].split(";")[0];
+            // check if proxy is reachable only when timeout is set in configuration
+            if (PreProxyFS.getTimeoutForProxyCheck() > 0) {
+                proxyToTake = Util.checkIfRemoteProxyIsReachable(proxyToTake);
+            } 
         }
         LOGGER.debug("Proxy: {} is used to connect to host: {}", proxyToTake, host);
         return proxyToTake;
