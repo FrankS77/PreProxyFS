@@ -68,10 +68,11 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
             // add proxy authorization: e.g. Proxy-Authorization: Basic
             // YWxhZGRpbjpvcGVuc2VzYW1l in second line
             System.arraycopy(auth.getBytes(StandardCharsets.US_ASCII), 0, modifiedRequest, posFirstLineBreak,
-                    auth.getBytes().length);
+                    auth.getBytes(StandardCharsets.US_ASCII).length);
             // add rest of original request to the modified request
             System.arraycopy(orgRequest, posFirstLineBreak, modifiedRequest,
-                    auth.getBytes().length + posFirstLineBreak, orgRequest.length - posFirstLineBreak);
+                    auth.getBytes(StandardCharsets.US_ASCII).length + posFirstLineBreak, 
+                    orgRequest.length - posFirstLineBreak);
             Util.traceLogRequestResponse(this.getClass().getName(), orgRequest);
         }
         return modifiedRequest;
