@@ -32,7 +32,7 @@ delight-rhino-sandbox (https://github.com/javadelight/delight-rhino-sandbox) and
   (the folder should contain the PreProxyFS<Version>.jar file and the lib folder). 
 * Create a (or more) PreProxyFS.properties file. Example:
 
-```
+```properties
 # Mandatory: Local proxy port. Must be a free local post. Default 65000
 MAIN_LOCAL_PORT = 65000
 # Mandatory: Path or URL to PAC script e.g. http://my.pac.server/remote.pac or /home/myuser/mypac.pac (windows c:/mypac.pac)
