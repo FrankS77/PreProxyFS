@@ -1,6 +1,7 @@
 package de.fschullerer.preproxyfs;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,12 @@ public class ForwardServerThread extends Thread {
      */
     public void setServerSocket(String hostName, int port) throws IOException {
         if (null == this.serverSocket) {
-            this.serverSocket = new Socket(hostName, port);
+            try {
+                this.serverSocket = new Socket(hostName, port);
+            } catch (ConnectException e) {
+                LOGGER.debug("Cannot connect to host: {} and port: {}", hostName, port);
+                throw e;
+            }
         }
         synchronized (waitForMe) {
             waitForMe.notifyAll();

@@ -50,7 +50,6 @@ public class PreProxyFS {
      * specific Intranet/Internet address.
      */
     private static PacScriptParser pacScriptParser;
-    private static String settingsFilePath = "";
     private static int mainPort;
     private static String pacUrl;
     private static DistributeServer mainDistributionServer;
@@ -114,11 +113,13 @@ public class PreProxyFS {
         }
         return userPassEncoded;
     }
-
+    
     /**
      * Read settings from properties file.
+     *
+     * @param settingsFilePath Path to settings file.
      */
-    private static void readSettings() {
+    private static void readSettings(String settingsFilePath) {
         // Read properties file in a Property object
         Properties props = new Properties();
         // read from settings file with utf-8
@@ -172,8 +173,8 @@ public class PreProxyFS {
     }
     
     private static void setTimeoutForProxyCheck(String timeout) {
-        // -1 means: do not use this feature
-        int timeoutToSet = -1;
+        // 0 means: do not use this feature
+        int timeoutToSet = 0;
         if (Util.isNumeric(timeout)) {
             timeoutToSet = Integer.parseInt(timeout);
         }
@@ -192,7 +193,7 @@ public class PreProxyFS {
             int leftSquareBracketCount = count(usersAndPassForProxies, "[");
             int rightSquareBracketCount = count(usersAndPassForProxies, "]");
             if ((leftSquareBracketCount < 4) || leftSquareBracketCount != rightSquareBracketCount) {
-                throw new PreProxyFSException("The configuration for USER_PASSWORD_MAP. Tip: Count "
+                throw new PreProxyFSException("The configuration for USER_PASSWORD_MAP is wrong. Tip: Count "
                    + "the square brackets [ and ] in variable. It must be 4 for each entry. Program exit.");
             }
             List<String> tempList = new ArrayList<>();
@@ -432,9 +433,8 @@ public class PreProxyFS {
             LOGGER.error("Call PreProxyFS script like e.g. (Linux) sh PreProxyFS /path/to/PreProxyFS.properties ");
             LOGGER.error("for e.g. (Windows) PreProxyFS.bat c:/path/to/PreProxyFS.properties ");
         } else {
-            settingsFilePath = args[0];
             // read settings file
-            readSettings();
+            readSettings(args[0]);
             startPreProxyFS(pacUrl, mainPort, proxyAuthenticationMap);
         }
     }

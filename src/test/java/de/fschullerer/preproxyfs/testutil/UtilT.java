@@ -1,7 +1,11 @@
 package de.fschullerer.preproxyfs.testutil;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Utility class.
@@ -47,5 +51,20 @@ public class UtilT {
             socket.getOutputStream().write(toWrite.getBytes());
             socket.getOutputStream().flush();
         }
+    }
+
+    /**
+     * Create temporary file for tests.
+     *
+     * @param content Content of file.
+     * @return Path to file.
+     * @throws IOException If error occurs during creation/writing to file.
+     */
+    public static String createTempPropFile(String content) throws IOException {
+        Path path = Files.createTempFile("testPreProxyFS", ".properties");
+        File file = path.toFile();
+        Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        file.deleteOnExit();
+        return file.getAbsolutePath();
     }
 }

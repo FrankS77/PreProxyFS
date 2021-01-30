@@ -26,7 +26,7 @@ public class DirectForwardServer extends Thread {
      * Create a new DirectForwardServer and bind the server socket to the given port.
      * Attention: A random free local port is chosen. Get it with {@link #getPort()}
      */
-    DirectForwardServer() {
+    public DirectForwardServer() {
         // empty
     }
 

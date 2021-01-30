@@ -1,6 +1,7 @@
 package de.fschullerer.preproxyfs.testutil;
 
 import de.fschullerer.preproxyfs.PreProxyFSException;
+import de.fschullerer.preproxyfs.Util;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
@@ -11,27 +12,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Create a socket thread to read from socket and get input as string.
+ * For testing purposes: Create a server socket that accepts incoming connections and send the original
+ * request (as is) back to sender.
  *
  * @author Frank Schullerer
  */
-public class ProxyReaderUtilThread extends Thread {
+public class ServerSocketThread extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyReaderUtilThread.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerSocketThread.class.getName());
     private final Object waitForServerSocket = new Object();
     private final Object waitForRequestReadFinished = new Object();
     private ServerSocket serverSocket;
-    private String requestString;
-
-    public ProxyReaderUtilThread() {
+    private StringBuilder messageStorage = new StringBuilder();
+    private boolean acceptRequests = true;
+    
+    public ServerSocketThread() {
         // empty
     }
 
-    public String getRequest() {
+    /**
+     * Get the messages that was received by this socket.
+     *
+     * @return The stored message.
+     */
+    public String getMessagesReceived() {
+        // this thread waits until notified in run method
         waitForRequestToBeRead();
-        return requestString;
+        String message = messageStorage.toString();
+        // clean for new messages
+        messageStorage = new StringBuilder();
+        return message;
     }
 
+    /**
+     * Close server socket.
+     */
+    public void closeSocket() {
+        this.acceptRequests = false;
+        if (null != serverSocket) {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                LOGGER.trace("Error closing test socket", e);
+            }
+        }
+    }
+    
     /**
      * The server socket port was not set directly. Get it here.
      *
@@ -70,7 +96,7 @@ public class ProxyReaderUtilThread extends Thread {
     public void run() {
         // Bind server on a free port
         byte[] request = new byte[1024];
-        int requestLength;
+
         Socket clientSocket = null;
         try (ServerSocket serverSocket = new ServerSocket(0)) {
             this.serverSocket = serverSocket;
@@ -78,28 +104,24 @@ public class ProxyReaderUtilThread extends Thread {
             synchronized (waitForServerSocket) {
                 waitForServerSocket.notifyAll();
             }
-            // We need only one message (1024byte should be enough), no loop
-
-            clientSocket = serverSocket.accept();
-            requestLength = clientSocket.getInputStream().read(request);
-            if (requestLength != -1) {
-                requestString = new String(request, StandardCharsets.US_ASCII).substring(0, requestLength);
-            } else {
-                requestString = "ERROR: no request!";
-            }
-            synchronized (waitForRequestReadFinished) {
-                waitForRequestReadFinished.notifyAll();
-            }
-        } catch (BindException e) {
-            throw new PreProxyFSException("Unable to bind ProxyReaderUtilThread to local port. Test exit.", e);
-        } catch (SocketException e) {
-            if (e.getMessage().equals("Socket closed")) {
-                LOGGER.info("Closing ProxyReaderUtilThread socket");
-            } else {
-                throw new PreProxyFSException("Error creating ProxyReaderUtilThread socket, Test exit.", e);
+            while (acceptRequests) {
+                clientSocket = serverSocket.accept();
+                try {
+                    request = Util.readFromClientSocket(clientSocket);
+                } catch (IOException e) {
+                    LOGGER.trace("Error in reading from client.", e);
+                }
+                if (request.length == 0) {
+                    messageStorage.append("ERROR: no request!");
+                } else {
+                    messageStorage.append(new String(request, StandardCharsets.US_ASCII));
+                }
+                synchronized (waitForRequestReadFinished) {
+                    waitForRequestReadFinished.notifyAll();
+                }
             }
         } catch (IOException e) {
-            throw new PreProxyFSException("Error creating ProxyReaderUtilThread socket, Test exit.", e);
+            LOGGER.debug("Error creating ServerSocketThread server socket", e);
         } finally {
             if (null != clientSocket) {
                 try {

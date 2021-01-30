@@ -25,6 +25,9 @@ public final class Util {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class.getName());
 
+    public static final String CONNECTION_ESTABLISHED = "HTTP/1.0 200 Connection established\r\n\r\n";
+
+
     /**
      * Private constructor.
      */
@@ -162,19 +165,17 @@ public final class Util {
      * @return The proxy if it is reachable or "DIRECT" if not.
      */
     public static String checkIfRemoteProxyIsReachable(String proxyToTake) {
-        String proxyToTakeChecked = "DIRECT";
+        String proxyToTakeChecked = DIRECT;
         String[] proxy = proxyToTake.split(":");
         if (proxy.length == 2) {
             String hostName = proxy[0];
             int port = Integer.parseInt(proxy[1]);
             SocketAddress address = new InetSocketAddress(hostName, port);
-            Socket socket = new Socket();
-            LOGGER.trace("Try connect to host: {}", hostName);
-            try {
+            try (Socket socket = new Socket()) {
+                LOGGER.trace("Try connect to host: {}", hostName);
                 socket.connect(address, PreProxyFS.getTimeoutForProxyCheck());
                 // is alive -> TRUE
                 proxyToTakeChecked = proxyToTake;
-                socket.close();
             } catch (IOException e) {
                 LOGGER.info("Proxy is not reachable within timeout. Try connect to remote host directly.");
                 LOGGER.trace("Unable to connect to host: {}", hostName, e);

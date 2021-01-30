@@ -8,6 +8,7 @@ import com.github.markusbernhardt.proxy.selector.pac.ProxyEvaluationException;
 import de.fschullerer.preproxyfs.DirectForwardServer;
 import de.fschullerer.preproxyfs.DistributeServer;
 import de.fschullerer.preproxyfs.PreProxyFS;
+import de.fschullerer.preproxyfs.ProxyForwardServer;
 import de.fschullerer.preproxyfs.testutil.PacScriptSourceString;
 import de.fschullerer.preproxyfs.testutil.ServerSocketThread;
 import de.fschullerer.preproxyfs.testutil.UtilT;
@@ -20,42 +21,36 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DistributionServerIT {
+class ProxyForwardServerIT {
 
-    @Mock
-    DirectForwardServer mockDirectForwardServer;
 
     @Test
     @Tag("IntegrationTest")
-    @DisplayName("DSIT001: Assert that DistributeServer will correctly forward requests to remote servers.")
+    @DisplayName("PFIT001: Assert that ProxyForwardServer will correctly forward requests to remote proxy.")
     void assertForward1() throws ProxyEvaluationException, IOException {
-        // create a helper endpoint-proxy that will read the forwarded request 
+        // create a helper endpoint-proxy that will read the forwarded request to remote proxy
         ServerSocketThread testingServer = new ServerSocketThread();
         testingServer.start();
         int proxyReaderPort = testingServer.getPort();
 
-        // create DistributeServer for tests
-        DistributeServer distributeServer = new DistributeServer(0);
-        distributeServer.start();
+        // create ProxyForwardServer and set to forward requests to ServerSocketThread
+        ProxyForwardServer proxyServer = new ProxyForwardServer("localhost", proxyReaderPort);
+        proxyServer.start();
 
-        // this will be a DIRECT connection, mock a DirectForwardServer
-        // and set port to the proxy helper thread port
-        // DistributeServer will then send DIRECT request to that port
-        when(mockDirectForwardServer.getPort()).thenReturn(proxyReaderPort);
-        PreProxyFS.setForwardServer(mockDirectForwardServer);
+ 
         // a sample PAC script with a DIRECT connection for localhost directions
         PacScriptSourceString pacScript = new PacScriptSourceString(UtilT.PAC_SCRIPT_1);
         PreProxyFS.setPacScriptParser(new JavaxPacScriptParser(pacScript));
         // a sample GET request with the helper proxy port as endpoint
         String originalRequest = "GET / HTTP/1.1\r\nHost: localhost:" + proxyReaderPort + "\r\nUser-agent:foo\r\n";
-        // send request to DistributeServer for distribution
-        int distributeServerLocalPort = distributeServer.getPort();
-        UtilT.simpleWriteToSocket("localhost", distributeServerLocalPort, originalRequest);
+        // send request to proxy server
+        int proxyServerLocalPort = proxyServer.getPort();
+        UtilT.simpleWriteToSocket("localhost", proxyServerLocalPort, originalRequest);
         // read the forwarded request from helper proxy
-        String requestRead = testingServer.getMessagesReceived();
+        String messageRead = testingServer.getMessagesReceived();
         testingServer.closeSocket();
-        distributeServer.getServerSocket().close();
-        assertThat(originalRequest).as("Input and output should be the same!").isEqualTo(requestRead);
+        proxyServer.getServerSocketP().close();
+        assertThat(originalRequest).as("Input and output should be the same!").isEqualTo(messageRead);
     }
 
 

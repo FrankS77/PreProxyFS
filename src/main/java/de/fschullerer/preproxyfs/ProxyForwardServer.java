@@ -30,7 +30,7 @@ public class ProxyForwardServer extends Thread {
      * @param remoteProxyHost The remote proxy hostname/IP.
      * @param remoteProxyPort The remote proxy port.
      */
-    ProxyForwardServer(String remoteProxyHost, int remoteProxyPort) {
+    public ProxyForwardServer(String remoteProxyHost, int remoteProxyPort) {
         this.remoteProxyHost = remoteProxyHost;
         this.remoteProxyPort = remoteProxyPort;
     }
@@ -40,7 +40,7 @@ public class ProxyForwardServer extends Thread {
      *
      * @return The server socket port number.
      */
-    int getPort() {
+    public int getPort() {
         waitForServerSocketToBeReady();
         return this.serverSocketP.getLocalPort();
     }
@@ -50,7 +50,7 @@ public class ProxyForwardServer extends Thread {
      *
      * @return server socket (can be null)
      */
-    ServerSocket getServerSocketP() {
+    public ServerSocket getServerSocketP() {
         waitForServerSocketToBeReady();
         return this.serverSocketP;
     }

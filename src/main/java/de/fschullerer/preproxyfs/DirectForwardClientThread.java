@@ -66,8 +66,7 @@ public class DirectForwardClientThread extends Thread implements ForwardServerTh
                 String httpReq = new String(request, StandardCharsets.US_ASCII);
                 // communication should always start with CONNECT (proxy connection) and then GET, POST ...
                 if (httpReq.startsWith("CONNECT")) {
-                    byte[] connectionEstablished = "HTTP/1.0 200 Connection established\r\n\r\n"
-                            .getBytes(StandardCharsets.US_ASCII);
+                    byte[] connectionEstablished = Util.CONNECTION_ESTABLISHED.getBytes(StandardCharsets.US_ASCII);
                     // directly write the Connection established response to the client socket because the
                     // server socket (a remote server) does not understand a CONNECT request if it is not
                     // a proxy. CONNECT requests are only for proxy connections.
