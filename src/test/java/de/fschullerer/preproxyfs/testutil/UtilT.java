@@ -37,7 +37,7 @@ public class UtilT {
             + "var myIP = myIpAddress ();\n" + "if (host == \"" + REMOTE_SERVER_ENDPOINT1 + "\"){\n" + "return \"PROXY "
             + PROXY1_CORPORATE + "\";}\n" + "if (host == \"" + REMOTE_SERVER_ENDPOINT2 + "\"){\n" + "return \"PROXY "
             + PROXY2_CORPORATE + "\";}\n" + "return \"DIRECT\";}\n";
-
+    
     /**
      * Simple send message to hostname:port.
      *
