@@ -52,6 +52,15 @@ public class ForwardServerThread extends Thread {
         return this.serverSocket;
     }
 
+    /**
+     * Check if server socket is already set.
+     *
+     * @return TRUE id server socket is NULL.
+     */
+    public boolean isServerSocketSet() {
+        return null != this.serverSocket && this.serverSocket.isConnected();
+    }
+
     private void waitForServerSocketToBeReady() {
         while (null == this.serverSocket) {
             synchronized (waitForMe) {

@@ -133,7 +133,7 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
         String httpReq = new String(orgRequest, StandardCharsets.US_ASCII);
         byte[] modifiedRequest = orgRequest;
         LOGGER.debug("Original request: {}", httpReq);
-        if (Util.isHttpHeader(httpReq)) {
+        if (Util.isHttpHeader(httpReq) && !this.distributeForwardServerThread.isServerSocketSet()) {
             // getting url/host from request
             String proxyToTake = getCorrectProxyForHttpRequest(httpReq);
             int localBindPort = PreProxyFS.getLocalProxyPort(proxyToTake);

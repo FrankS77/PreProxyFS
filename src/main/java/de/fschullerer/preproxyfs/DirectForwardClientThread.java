@@ -47,6 +47,63 @@ public class DirectForwardClientThread extends Thread implements ForwardServerTh
     }
 
     /**
+     * Directly write the Connection established response to the client socket because the
+     * server socket (a remote server) does not understand a CONNECT request if it is not
+     * a proxy. CONNECT requests are only for proxy connections.
+     *
+     * @param httpReq The Http request as string.
+     * @throws IOException Error while writing to socket.
+     */
+    private void handleHttpConnect(String httpReq) throws IOException {
+        if (httpReq.startsWith("CONNECT")) {
+            byte[] connectionEstablished = Util.CONNECTION_ESTABLISHED.getBytes(StandardCharsets.US_ASCII);
+            clientSocket.getOutputStream().write(connectionEstablished);
+        }
+    }
+
+    /**
+     * Handle only the Http (non encrypted) requests. Also the CONNECT method:
+     * Even for Https connections: the first connection from client e.g. browser is to
+     * this proxy (PreProxyFS) and this is a Http proxy. The CONNECT method should show destincation 
+     * remote host and port.
+     *
+     * @param httpReq The Http request as string.
+     * @throws IOException Error while setting server socket.
+     */
+    private void handleNonEncryptedHttpMethods(String httpReq) throws IOException {
+        if (Util.isHttpHeader(httpReq) && !directForwardServerThread.isServerSocketSet()) {
+            // only if not yet a connection already exists
+            String url = Util.getUrl(httpReq);
+            String[] urlSplit = url.split("://");
+            String hostFromUrl = "";
+            int portFromUrl = 80;
+            if (urlSplit.length == 1) {
+                hostFromUrl = urlSplit[0];
+            } else if (urlSplit.length > 1) {
+                hostFromUrl = urlSplit[1];
+            }
+            String[] portSplit = hostFromUrl.split(":");
+            if (portSplit.length > 1) {
+                hostFromUrl = portSplit[0];
+                portFromUrl = Integer.parseInt(portSplit[1]);
+            }
+            // set parent server socket with remote server port
+            // socket will be closed in thread
+            this.directForwardServerThread.setServerSocket(hostFromUrl, portFromUrl);
+            // start server thread after we set the server socket
+            this.directForwardServerThread.start();
+        }
+    }
+    
+    private void forwardRequest(String httpReq, byte[] request) throws IOException {
+        if (!httpReq.startsWith("CONNECT")) {
+            // not a CONNECT request -> forward the request 
+            this.directForwardServerThread.getServerSocket().getOutputStream().write(request);
+            this.directForwardServerThread.getServerSocket().getOutputStream().flush();
+        }
+    }
+
+    /**
      * Read from client socket and write to the server socket until it is possible.
      * If reading or writing can not be done (due to exception or
      * when the stream is at his end) or writing is failed, exits the thread.
@@ -61,37 +118,12 @@ public class DirectForwardClientThread extends Thread implements ForwardServerTh
                 if (request.length == 0) {
                     break;
                 }
-
                 // US_ASCII !!!! not UTF-8 !!
                 String httpReq = new String(request, StandardCharsets.US_ASCII);
                 // communication should always start with CONNECT (proxy connection) and then GET, POST ...
-                if (httpReq.startsWith("CONNECT")) {
-                    byte[] connectionEstablished = Util.CONNECTION_ESTABLISHED.getBytes(StandardCharsets.US_ASCII);
-                    // directly write the Connection established response to the client socket because the
-                    // server socket (a remote server) does not understand a CONNECT request if it is not
-                    // a proxy. CONNECT requests are only for proxy connections.
-                    clientSocket.getOutputStream().write(connectionEstablished);
-                    // We need the host name and port number from the CONNECT request to forward the request
-                    // to the correct server
-                    String url = Util.getUrl(httpReq);
-                    String[] urlSplit = url.split(":");
-                    String hostFromUrl = "";
-                    int portFromUrl = 443;
-                    if (urlSplit.length > 0) {
-                        hostFromUrl = urlSplit[0];
-                        portFromUrl = Integer.parseInt(urlSplit[1]);
-                    }
-                    // set parent server socket with remote server port
-                    // socket will be closed in thread
-                    this.directForwardServerThread.setServerSocket(hostFromUrl, portFromUrl);
-                    // start server thread after we set the server socket
-                    this.directForwardServerThread.start();
-
-                } else {
-                    // not a CONNECT request -> forward the request 
-                    this.directForwardServerThread.getServerSocket().getOutputStream().write(request);
-                    this.directForwardServerThread.getServerSocket().getOutputStream().flush();
-                }
+                handleHttpConnect(httpReq);
+                handleNonEncryptedHttpMethods(httpReq);
+                forwardRequest(httpReq, request);
             }
         } catch (Exception e) {
             // Connection is broken --> exit the thread
