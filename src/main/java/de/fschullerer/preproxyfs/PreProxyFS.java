@@ -38,7 +38,7 @@ public class PreProxyFS {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreProxyFS.class.getName());
 
-    private static final int DEFAULT_LOCAL_BIND_PORT = 65000;
+    public static final int DEFAULT_LOCAL_BIND_PORT = 65000;
     /**
      * The list contain remote proxies that were started by
      * {@link #startProxyForwardServer}.
