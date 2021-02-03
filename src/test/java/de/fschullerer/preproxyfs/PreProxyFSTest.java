@@ -1,35 +1,20 @@
-package de.fschullerer.preproxyfs.unitest;
+package de.fschullerer.preproxyfs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
-import com.github.markusbernhardt.proxy.selector.pac.JavaxPacScriptParser;
-import com.github.markusbernhardt.proxy.selector.pac.ProxyEvaluationException;
-import de.fschullerer.preproxyfs.DirectForwardServer;
-import de.fschullerer.preproxyfs.DistributeServer;
-import de.fschullerer.preproxyfs.PreProxyFS;
-import de.fschullerer.preproxyfs.PreProxyFSException;
-import de.fschullerer.preproxyfs.testutil.PacScriptSourceString;
-import de.fschullerer.preproxyfs.testutil.ServerSocketThread;
 import de.fschullerer.preproxyfs.testutil.UtilT;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Unit tests for main class.
  */
 class PreProxyFSTest {
-    
+
     @Test
     @Tag("UnitTest")
     @DisplayName("PREFS001: Assert that an specific PreProxyFSException occurs when trying to "
@@ -79,7 +64,7 @@ class PreProxyFSTest {
     @Test
     @Tag("UnitTest")
     @DisplayName("PREFS004: Assert that an specific PreProxyFSException occurs when trying to "
-                         + "start PreProxyFS with non existing PAC file setting in property file. " 
+                         + "start PreProxyFS with non existing PAC file setting in property file. "
                          + "Starting via main method.")
     void assertPreProxyFS4() throws IOException {
         String pathToFile = UtilT.createTempPropFile("PAC_URL = /path/to/non-existing-PAC-file");
@@ -99,7 +84,7 @@ class PreProxyFSTest {
                          + "start PreProxyFS with wrong configured USER_PASSWORD_MAP value in property file. ")
     void assertPreProxyFS5() throws IOException {
         String pathToPacFile = UtilT.createTempPropFile(UtilT.PAC_SCRIPT_1);
-        String pathToPropertyFile = UtilT.createTempPropFile("PAC_URL = " 
+        String pathToPropertyFile = UtilT.createTempPropFile("PAC_URL = "
                                                                      + pathToPacFile + "\nUSER_PASSWORD_MAP = []]]");
         String[] args = {pathToPropertyFile};
         Exception exception = assertThrows(PreProxyFSException.class, () -> {
@@ -111,4 +96,20 @@ class PreProxyFSTest {
                 .startsWith(expectedMessage);
     }
 
+    @Test
+    @Tag("UnitTest")
+    @DisplayName("PREFS006: Assert that setUserPasswordMap is working correctly.")
+    void assertPreProxyFS6() {
+        String proxy1 = "remote.proxy1.com:8080";
+        String user1 = "myUserName";
+        String pass1 = "myPassword";
+        String proxy2 = "remote.proxy2.com:8080";
+        String user2 = "myUserName2";
+        String pass2 = "myPassword2";
+        String userAuthString = "[" + proxy1 + "[[" + user1 + "][" + pass1 + "]]]"
+                                        + "[" + proxy2 + "[[" + user2 + "][" + pass2 + "]]]";
+        Map<String, String[]> userAuthActual = PreProxyFS.setUserPasswordMap(userAuthString);
+        assertThat(userAuthActual).as("The user authentication map should contain 2 entries!")
+                .hasSize(2);
+    }
 }

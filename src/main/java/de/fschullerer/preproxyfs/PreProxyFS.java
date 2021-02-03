@@ -132,7 +132,7 @@ public class PreProxyFS {
         }
         setPacUrl(props.getProperty("PAC_URL"));
         setMainBindPort(props.getProperty("MAIN_LOCAL_PORT"));
-        setUserPasswordMap(props.getProperty("USER_PASSWORD_MAP", ""));
+        proxyAuthenticationMap = setUserPasswordMap(props.getProperty("USER_PASSWORD_MAP", ""));
         setTimeoutForProxyCheck(props.getProperty("TIMEOUT_FOR_PROXY_CHECK", "0"));
     }
 
@@ -187,8 +187,10 @@ public class PreProxyFS {
      *
      * @param usersAndPassForProxies The USER_PASSWORD_MAP property value. Can be
      *                               empty.
+     * @return Map with user authentications for the PAC proxies.
      */
-    private static void setUserPasswordMap(String usersAndPassForProxies) {
+     static Map<String, String[]> setUserPasswordMap(String usersAndPassForProxies) { 
+        Map<String, String[]> userAuth = new HashMap<>();
         if (!"".equals(usersAndPassForProxies)) {
             int leftSquareBracketCount = count(usersAndPassForProxies, "[");
             int rightSquareBracketCount = count(usersAndPassForProxies, "]");
@@ -212,9 +214,10 @@ public class PreProxyFS {
                 // if there must be a [ or ] is password, use the HTML code one
                 password = password.replace("&#91;", "[");
                 password = password.replace("&#93;", "]");
-                proxyAuthenticationMap.put(remoteProxy, new String[] {username, password});
+                userAuth.put(remoteProxy, new String[] {username, password});
             }
         }
+        return userAuth;
     }
 
     /**

@@ -1,4 +1,4 @@
-package de.fschullerer.preproxyfs.it;
+package de.fschullerer.preproxyfs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
