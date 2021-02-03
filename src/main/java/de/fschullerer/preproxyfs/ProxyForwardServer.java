@@ -9,23 +9,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Permanent running thread.
- * The ProxyForwardServer will handle all requests coming from the {@link DistributeForwardClientThread}
- * to serve proxy connections to remote servers.
+ * Permanent running thread. The ProxyForwardServer will handle all requests coming from the {@link
+ * DistributeForwardClientThread} to serve proxy connections to remote servers.
  *
  * @author Frank Schullerer
  */
 public class ProxyForwardServer extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyForwardServer.class.getName());
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ProxyForwardServer.class.getName());
     private final Object waitForMe = new Object();
     private final String remoteProxyHost;
     private final int remoteProxyPort;
     private ServerSocket serverSocketP;
 
     /**
-     * This will create a ProxyForwardServer to a concrete destination (a remote proxy).
-     * The local bind port will be set automatically (a free random port)
+     * This will create a ProxyForwardServer to a concrete destination (a remote proxy). The local
+     * bind port will be set automatically (a free random port)
      *
      * @param remoteProxyHost The remote proxy hostname/IP.
      * @param remoteProxyPort The remote proxy port.
@@ -62,7 +62,8 @@ public class ProxyForwardServer extends Thread {
                     waitForMe.wait(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new PreProxyFSException("Timeout waiting for server socket. Should not happen.", e);
+                    throw new PreProxyFSException(
+                            "Timeout waiting for server socket. Should not happen.", e);
                 }
             }
         }
@@ -78,12 +79,11 @@ public class ProxyForwardServer extends Thread {
     }
 
     /**
-     * Starts the direct forward server - binds on a given port and starts serving.
-     * Create 2 threads for every connection requests incoming. Create one client thread
-     * to read requests from client socket and send them to remote server.
-     * Create forward thread to read responses from remote server and forward
-     * them to the client (client socket).
-     * The two threads live only for the communication time.
+     * Starts the direct forward server - binds on a given port and starts serving. Create 2 threads
+     * for every connection requests incoming. Create one client thread to read requests from client
+     * socket and send them to remote server. Create forward thread to read responses from remote
+     * server and forward them to the client (client socket). The two threads live only for the
+     * communication time.
      */
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
@@ -91,8 +91,12 @@ public class ProxyForwardServer extends Thread {
         // Bind server on given TCP port
         try (ServerSocket serverSocket = new ServerSocket(0)) {
             this.serverSocketP = serverSocket;
-            LOGGER.info("Start ProxyForwardServer on TCP port: {} . Connected"
-                    + " to remote proxy: {}:{}", this.serverSocketP.getLocalPort(), remoteProxyHost, remoteProxyPort);
+            LOGGER.info(
+                    "Start ProxyForwardServer on TCP port: {} . Connected"
+                            + " to remote proxy: {}:{}",
+                    this.serverSocketP.getLocalPort(),
+                    remoteProxyHost,
+                    remoteProxyPort);
             synchronized (waitForMe) {
                 waitForMe.notifyAll();
             }
@@ -102,22 +106,26 @@ public class ProxyForwardServer extends Thread {
                 Socket clientSocket = serverSocket.accept();
                 ProxyForwardClientThread clientForward = new ProxyForwardClientThread(clientSocket);
                 // bind the two threads together
-                ForwardServerThread serverForward = new ForwardServerThread(clientForward,
-                        this.remoteProxyHost, this.remoteProxyPort);
+                ForwardServerThread serverForward =
+                        new ForwardServerThread(
+                                clientForward, this.remoteProxyHost, this.remoteProxyPort);
                 clientForward.setForwardServerThread(serverForward);
                 clientForward.start();
                 serverForward.start();
             }
         } catch (BindException e) {
-            throw new PreProxyFSException("Unable to bind ProxyForwardServer to local port. Program exit.", e);
+            throw new PreProxyFSException(
+                    "Unable to bind ProxyForwardServer to local port. Program exit.", e);
         } catch (SocketException e) {
             if (e.getMessage().equals("Socket closed")) {
                 LOGGER.info("Closing DistributeServer socket");
             } else {
-                throw new PreProxyFSException("Error creating ProxyForwardServer socket, Program exit.", e);
+                throw new PreProxyFSException(
+                        "Error creating ProxyForwardServer socket, Program exit.", e);
             }
         } catch (IOException e) {
-            throw new PreProxyFSException("Error creating ProxyForwardServer socket, Program exit.", e);
+            throw new PreProxyFSException(
+                    "Error creating ProxyForwardServer socket, Program exit.", e);
         }
     }
 }

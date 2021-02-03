@@ -23,30 +23,45 @@ public class UtilT {
     public static final String[] TEST_AUTH = {"user1", "pass1"};
     public static final String BASIC_AUTH_BASE64_FOR_TEST_AUTH = "dXNlcjE6cGFzczE=";
 
-    public static final String STANDARD_REQUEST_WITH_AUTH = "GET / HTTP/1.1\r\nProxy-Authorization: Basic "
-            + BASIC_AUTH_BASE64_FOR_TEST_AUTH + "\r\nHost: " + REMOTE_SERVER_ENDPOINT2_PORT + "\r\nUser-agent:foo\r\n";
-    public static final String STANDARD_REQUEST = "GET / HTTP/1.1\r\nHost: " + REMOTE_SERVER_ENDPOINT2_PORT
-            + "\r\nUser-agent:foo\r\n";
+    public static final String STANDARD_REQUEST_WITH_AUTH =
+            "GET / HTTP/1.1\r\nProxy-Authorization: Basic "
+                    + BASIC_AUTH_BASE64_FOR_TEST_AUTH
+                    + "\r\nHost: "
+                    + REMOTE_SERVER_ENDPOINT2_PORT
+                    + "\r\nUser-agent:foo\r\n";
+    public static final String STANDARD_REQUEST =
+            "GET / HTTP/1.1\r\nHost: " + REMOTE_SERVER_ENDPOINT2_PORT + "\r\nUser-agent:foo\r\n";
     public static final String STANDARD_REQUEST_DIRECT_PAC_SCRIPT_V2 =
             "GET / HTTP/1.1\r\nHost: corp.example3.com:8090\r\nUser-agent:foo\r\n";
 
-    /**
-     * PAC script with 2 proxies and DIRECT connection as default.
-     */
-    public static final String PAC_SCRIPT_1 = "function FindProxyForURL(url, host) {\n"
-            + "var myIP = myIpAddress ();\n" + "if (host == \"" + REMOTE_SERVER_ENDPOINT1 + "\"){\n" + "return \"PROXY "
-            + PROXY1_CORPORATE + "\";}\n" + "if (host == \"" + REMOTE_SERVER_ENDPOINT2 + "\"){\n" + "return \"PROXY "
-            + PROXY2_CORPORATE + "\";}\n" + "return \"DIRECT\";}\n";
-    
+    /** PAC script with 2 proxies and DIRECT connection as default. */
+    public static final String PAC_SCRIPT_1 =
+            "function FindProxyForURL(url, host) {\n"
+                    + "var myIP = myIpAddress ();\n"
+                    + "if (host == \""
+                    + REMOTE_SERVER_ENDPOINT1
+                    + "\"){\n"
+                    + "return \"PROXY "
+                    + PROXY1_CORPORATE
+                    + "\";}\n"
+                    + "if (host == \""
+                    + REMOTE_SERVER_ENDPOINT2
+                    + "\"){\n"
+                    + "return \"PROXY "
+                    + PROXY2_CORPORATE
+                    + "\";}\n"
+                    + "return \"DIRECT\";}\n";
+
     /**
      * Simple send message to hostname:port.
      *
      * @param hostName The host.
-     * @param port     The port.
-     * @param toWrite  Message to send.
+     * @param port The port.
+     * @param toWrite Message to send.
      * @throws IOException In case writing failed.
      */
-    public static void simpleWriteToSocket(String hostName, int port, String toWrite) throws IOException {
+    public static void simpleWriteToSocket(String hostName, int port, String toWrite)
+            throws IOException {
         try (Socket socket = new Socket(hostName, port)) {
             socket.getOutputStream().write(toWrite.getBytes());
             socket.getOutputStream().flush();

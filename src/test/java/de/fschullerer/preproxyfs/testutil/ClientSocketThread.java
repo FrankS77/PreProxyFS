@@ -9,15 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * For testing purposes: Create a client socket connection to a remote or local host 
- * and send/receive messages.
+ * For testing purposes: Create a client socket connection to a remote or local host and
+ * send/receive messages.
  *
  * @author Frank Schullerer
  */
 public class ClientSocketThread extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientSocketThread.class.getName());
- 
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ClientSocketThread.class.getName());
+
     private final Object waitForRequestReadFinished = new Object();
     private boolean acceptRequests = true;
     private StringBuilder messageStorage = new StringBuilder();
@@ -49,17 +50,15 @@ public class ClientSocketThread extends Thread {
     }
 
     /**
-     * Alternative for {@link #getMessagesReceived} if messages before are
-     * not interesting. Wait until request is read.
+     * Alternative for {@link #getMessagesReceived} if messages before are not interesting. Wait
+     * until request is read.
      */
     public void resetMessages() {
         waitForRequestToBeRead();
         messageStorage = new StringBuilder();
     }
 
-    /**
-     * Close client socket.
-     */
+    /** Close client socket. */
     public void closeSocket() {
         this.acceptRequests = false;
         if (null != clientSocket) {
@@ -81,7 +80,7 @@ public class ClientSocketThread extends Thread {
         this.clientSocket.getOutputStream().write(toWrite.getBytes());
         this.clientSocket.getOutputStream().flush();
     }
-    
+
     private void waitForRequestToBeRead() {
         synchronized (waitForRequestReadFinished) {
             try {
@@ -93,9 +92,7 @@ public class ClientSocketThread extends Thread {
         }
     }
 
-    /**
-     * Read messages from this socket and store them into {@link #messageStorage}.
-     */
+    /** Read messages from this socket and store them into {@link #messageStorage}. */
     @Override
     public void run() {
         while (acceptRequests) {

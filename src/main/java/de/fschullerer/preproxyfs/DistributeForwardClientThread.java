@@ -7,29 +7,27 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * This thread will distribute all requests coming to the PreProxyFS#mainPort to
- * the defined proxies (or direct connection) in the PAC script.
+ * This thread will distribute all requests coming to the PreProxyFS#mainPort to the defined proxies
+ * (or direct connection) in the PAC script.
  *
  * @author Frank Schullerer
  */
 public class DistributeForwardClientThread extends Thread implements ForwardServerThreadInterface {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DistributeForwardClientThread.class.getName());
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(DistributeForwardClientThread.class.getName());
     private final Socket clientSocket;
     private ForwardServerThread distributeForwardServerThread;
 
-    /**
-     * Creates a new distribution thread.
-     */
+    /** Creates a new distribution thread. */
     public DistributeForwardClientThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
     }
 
     /**
-     * Bind this DistributeForwardClientThread to a forwarding server thread. So it
-     * is possible to get the server socket.
+     * Bind this DistributeForwardClientThread to a forwarding server thread. So it is possible to
+     * get the server socket.
      *
      * @param distributeForwardServerThread Bind with ForwardServerThread.
      */
@@ -37,9 +35,7 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
         this.distributeForwardServerThread = distributeForwardServerThread;
     }
 
-    /**
-     * Get the client socket. The server thread needs it.
-     */
+    /** Get the client socket. The server thread needs it. */
     @Override
     public Socket getClientSocket() {
         return this.clientSocket;
@@ -48,9 +44,10 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
     /**
      * Add basic authentication to request if needed.
      *
-     * @param orgRequest  The original request as a byte array.
+     * @param orgRequest The original request as a byte array.
      * @param proxyToTake The proxy for this Http request.
-     * @return The modified request if a basic authentication header is set, else the original request.
+     * @return The modified request if a basic authentication header is set, else the original
+     *     request.
      */
     public byte[] addHttpBasicAuthentication(byte[] orgRequest, String proxyToTake) {
         String httpReq = new String(orgRequest, StandardCharsets.US_ASCII);
@@ -67,11 +64,18 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
             System.arraycopy(orgRequest, 0, modifiedRequest, 0, posFirstLineBreak);
             // add proxy authorization: e.g. Proxy-Authorization: Basic
             // YWxhZGRpbjpvcGVuc2VzYW1l in second line
-            System.arraycopy(auth.getBytes(StandardCharsets.US_ASCII), 0, modifiedRequest, posFirstLineBreak,
+            System.arraycopy(
+                    auth.getBytes(StandardCharsets.US_ASCII),
+                    0,
+                    modifiedRequest,
+                    posFirstLineBreak,
                     auth.getBytes(StandardCharsets.US_ASCII).length);
             // add rest of original request to the modified request
-            System.arraycopy(orgRequest, posFirstLineBreak, modifiedRequest,
-                    auth.getBytes(StandardCharsets.US_ASCII).length + posFirstLineBreak, 
+            System.arraycopy(
+                    orgRequest,
+                    posFirstLineBreak,
+                    modifiedRequest,
+                    auth.getBytes(StandardCharsets.US_ASCII).length + posFirstLineBreak,
                     orgRequest.length - posFirstLineBreak);
             Util.traceLogRequestResponse(this.getClass().getName(), orgRequest);
         }
@@ -79,11 +83,10 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
     }
 
     /**
-     * Get the correct proxy for this request. It is tested if the proxy is reachable.
-     * If the proxy is not reachable, try the DIRECT connection. This is useful, if PreProxyFS
-     * is used with a VPN. If the VPN is off, PreProxyFS will forward all requests directly
-     * but always with a small delay, because the connection to the proxy is always tested with
-     * a timeout.
+     * Get the correct proxy for this request. It is tested if the proxy is reachable. If the proxy
+     * is not reachable, try the DIRECT connection. This is useful, if PreProxyFS is used with a
+     * VPN. If the VPN is off, PreProxyFS will forward all requests directly but always with a small
+     * delay, because the connection to the proxy is always tested with a timeout.
      *
      * @param httpReq The request converted to a string.
      * @return The proxy to take e.g. remote.proxy1.com:8080
@@ -101,7 +104,7 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
             // check if proxy is reachable only when timeout is set in configuration
             if (PreProxyFS.getTimeoutForProxyCheck() > 0) {
                 proxyToTake = Util.checkIfRemoteProxyIsReachable(proxyToTake);
-            } 
+            }
         }
         LOGGER.debug("Proxy: {} is used to connect to host: {}", proxyToTake, host);
         return proxyToTake;
@@ -124,11 +127,11 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
      *
      * @param orgRequest The original request.
      * @return The modified request if basic authentication was added, else original request.
-     * @throws IOException              Error while set server socket.
+     * @throws IOException Error while set server socket.
      * @throws ProxyEvaluationException Error getting correct proxy from PAC script.
      */
-    public byte[] startForwardServerThreadForHttpRequest(byte[] orgRequest) throws IOException,
-            ProxyEvaluationException {
+    public byte[] startForwardServerThreadForHttpRequest(byte[] orgRequest)
+            throws IOException, ProxyEvaluationException {
         // convert to string only to check if requests contains CONNECT header
         String httpReq = new String(orgRequest, StandardCharsets.US_ASCII);
         byte[] modifiedRequest = orgRequest;
@@ -150,9 +153,7 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
         return modifiedRequest;
     }
 
-    /**
-     * Close all sockets.
-     */
+    /** Close all sockets. */
     void closeSockets() {
         try {
             if (null != this.clientSocket) {
@@ -168,10 +169,9 @@ public class DistributeForwardClientThread extends Thread implements ForwardServ
     }
 
     /**
-     * Read from client socket and write to the server socket until it is possible.
-     * Handle proxy authentication.
-     * If reading or writing can not be done (due to exception or
-     * when the stream is at his end) or writing is failed, exits the thread.
+     * Read from client socket and write to the server socket until it is possible. Handle proxy
+     * authentication. If reading or writing can not be done (due to exception or when the stream is
+     * at his end) or writing is failed, exits the thread.
      */
     @Override
     public void run() {

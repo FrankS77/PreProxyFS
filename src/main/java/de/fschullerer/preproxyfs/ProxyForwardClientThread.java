@@ -6,27 +6,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple forwarding thread.Forward the client request without modification to
- * the remote proxy.
+ * Simple forwarding thread.Forward the client request without modification to the remote proxy.
  *
  * @author Frank Schullerer
  */
 public class ProxyForwardClientThread extends Thread implements ForwardServerThreadInterface {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyForwardClientThread.class.getName());
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ProxyForwardClientThread.class.getName());
     private final Socket clientSocket;
     private ForwardServerThread proxyForwardServerThread;
 
-    /**
-     * Creates a new proxy forwarding thread.
-     */
+    /** Creates a new proxy forwarding thread. */
     ProxyForwardClientThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
     }
 
     /**
-     * Bind this ProxyForwardClientThread to a forwarding server thread. So it is
-     * possible to get the server socket.
+     * Bind this ProxyForwardClientThread to a forwarding server thread. So it is possible to get
+     * the server socket.
      *
      * @param proxyForwardServerThread Bind this object with ForwardServerThread.
      */
@@ -34,17 +32,13 @@ public class ProxyForwardClientThread extends Thread implements ForwardServerThr
         this.proxyForwardServerThread = proxyForwardServerThread;
     }
 
-    /**
-     * Get the client socket. The server thread needs it.
-     */
+    /** Get the client socket. The server thread needs it. */
     @Override
     public Socket getClientSocket() {
         return this.clientSocket;
     }
 
-    /**
-     * Read from client socket and write to the server socket until it is possible.
-     */
+    /** Read from client socket and write to the server socket until it is possible. */
     @Override
     public void run() {
         byte[] request;
@@ -68,7 +62,8 @@ public class ProxyForwardClientThread extends Thread implements ForwardServerThr
                 if (null != this.clientSocket) {
                     this.clientSocket.close();
                 }
-                if (null != this.proxyForwardServerThread && null != this.proxyForwardServerThread.getServerSocket()) {
+                if (null != this.proxyForwardServerThread
+                        && null != this.proxyForwardServerThread.getServerSocket()) {
                     this.proxyForwardServerThread.getServerSocket().close();
                 }
             } catch (IOException e) {

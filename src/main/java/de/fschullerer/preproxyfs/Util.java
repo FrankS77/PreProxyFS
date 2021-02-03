@@ -18,26 +18,21 @@ import org.slf4j.LoggerFactory;
 public final class Util {
 
     public static final String DIRECT = "DIRECT";
-    /**
-     * Global default buffer size for connections.
-     */
+    /** Global default buffer size for connections. */
     static final int DEFAULT_BUFFER_SIZE = 65536;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class.getName());
 
-    public static final String CONNECTION_ESTABLISHED = "HTTP/1.0 200 Connection established\r\n\r\n";
+    public static final String CONNECTION_ESTABLISHED =
+            "HTTP/1.0 200 Connection established\r\n\r\n";
 
-
-    /**
-     * Private constructor.
-     */
+    /** Private constructor. */
     private Util() {
         // empty
     }
 
     /**
-     * Get the index position after! the first line break (\r\n == 1310) in byte
-     * array.
+     * Get the index position after! the first line break (\r\n == 1310) in byte array.
      *
      * @param byteArray The byte array.
      * @return -1 if position is not found else the index position.
@@ -68,7 +63,7 @@ public final class Util {
         }
         return url;
     }
-    
+
     /**
      * Get host name from HTTP header.
      *
@@ -98,19 +93,24 @@ public final class Util {
      */
     static boolean isHttpHeader(String request) {
         boolean startsWithHeader = false;
-        if ((request.startsWith("GET ") || request.startsWith("POST ") || request.startsWith("PUT ")
-                || request.startsWith("HEAD ") || request.startsWith("DELETE ") || request.startsWith("CONNECT ")
-                || request.startsWith("OPTIONS ") || request.startsWith("TRACE ") || request.startsWith("PATCH "))
+        if ((request.startsWith("GET ")
+                        || request.startsWith("POST ")
+                        || request.startsWith("PUT ")
+                        || request.startsWith("HEAD ")
+                        || request.startsWith("DELETE ")
+                        || request.startsWith("CONNECT ")
+                        || request.startsWith("OPTIONS ")
+                        || request.startsWith("TRACE ")
+                        || request.startsWith("PATCH "))
                 && request.contains("Host: ")) {
             startsWithHeader = true;
         }
         return startsWithHeader;
     }
-    
+
     /**
-     * Get the original request from client socket and reduce the byte length to
-     * the real request length (with zeros until end of byte array).
-     * So request.length is always the correct length.
+     * Get the original request from client socket and reduce the byte length to the real request
+     * length (with zeros until end of byte array). So request.length is always the correct length.
      *
      * @param socket The socket to get input stream from.
      * @return The original request.
@@ -177,7 +177,8 @@ public final class Util {
                 // is alive -> TRUE
                 proxyToTakeChecked = proxyToTake;
             } catch (IOException e) {
-                LOGGER.info("Proxy is not reachable within timeout. Try connect to remote host directly.");
+                LOGGER.info(
+                        "Proxy is not reachable within timeout. Try connect to remote host directly.");
                 LOGGER.trace("Unable to connect to host: {}", hostName, e);
             }
         }

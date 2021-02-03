@@ -14,6 +14,7 @@ plugins {
     id 'org.mikeneck.graalvm-native-image' version 'v1.0.2'
     id 'name.remal.sonarlint' version '1.2.2'
     id 'checkstyle'
+    id "com.diffplug.spotless" version "5.9.0"
     id 'jacoco'
     id 'distribution'
 }
@@ -54,7 +55,13 @@ jacocoTestReport {
     dependsOn test
 }
 
-
+spotless {
+    java {
+        importOrder()
+        googleJavaFormat().aosp()
+        removeUnusedImports()
+    }
+}
 
 test {
     useJUnitPlatform()

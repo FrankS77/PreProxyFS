@@ -3,29 +3,28 @@ package de.fschullerer.preproxyfs.testutil;
 import de.fschullerer.preproxyfs.PreProxyFSException;
 import de.fschullerer.preproxyfs.Util;
 import java.io.IOException;
-import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * For testing purposes: Create a server socket that accepts incoming connections and send the original
- * request (as is) back to sender.
+ * For testing purposes: Create a server socket that accepts incoming connections and send the
+ * original request (as is) back to sender.
  *
  * @author Frank Schullerer
  */
 public class ServerSocketThread extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerSocketThread.class.getName());
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ServerSocketThread.class.getName());
     private final Object waitForServerSocket = new Object();
     private final Object waitForRequestReadFinished = new Object();
     private ServerSocket serverSocket;
     private StringBuilder messageStorage = new StringBuilder();
     private boolean acceptRequests = true;
-    
+
     public ServerSocketThread() {
         // empty
     }
@@ -44,9 +43,7 @@ public class ServerSocketThread extends Thread {
         return message;
     }
 
-    /**
-     * Close server socket.
-     */
+    /** Close server socket. */
     public void closeSocket() {
         this.acceptRequests = false;
         if (null != serverSocket) {
@@ -57,7 +54,7 @@ public class ServerSocketThread extends Thread {
             }
         }
     }
-    
+
     /**
      * The server socket port was not set directly. Get it here.
      *
@@ -67,7 +64,7 @@ public class ServerSocketThread extends Thread {
         waitForServerSocketToBeReady();
         return this.serverSocket.getLocalPort();
     }
-    
+
     private void waitForServerSocketToBeReady() {
         while (null == this.serverSocket) {
             synchronized (waitForServerSocket) {
@@ -100,7 +97,9 @@ public class ServerSocketThread extends Thread {
         Socket clientSocket = null;
         try (ServerSocket serverSocket = new ServerSocket(0)) {
             this.serverSocket = serverSocket;
-            LOGGER.info("Start ProxyReaderUtilThread on TCP port : {}", this.serverSocket.getLocalPort());
+            LOGGER.info(
+                    "Start ProxyReaderUtilThread on TCP port : {}",
+                    this.serverSocket.getLocalPort());
             synchronized (waitForServerSocket) {
                 waitForServerSocket.notifyAll();
             }

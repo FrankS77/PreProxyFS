@@ -18,11 +18,8 @@ public class MockSocket extends Socket {
 
     private byte[] input;
 
-    /**
-     * Constructor.
-     */
-    public MockSocket() {
-    }
+    /** Constructor. */
+    public MockSocket() {}
 
     @Override
     public InputStream getInputStream() {

@@ -13,7 +13,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ForwardServerThread extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ForwardServerThread.class.getName());
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ForwardServerThread.class.getName());
     private final ForwardServerThreadInterface forwardClientThread;
     private Socket serverSocket;
     private final Object waitForMe = new Object();
@@ -22,11 +23,12 @@ public class ForwardServerThread extends Thread {
      * Create server socket where we know the destination.
      *
      * @param forwardClientThread The client thread.
-     * @param remoteHost          The remote host name.
-     * @param remotePort          The remote host port.
+     * @param remoteHost The remote host name.
+     * @param remotePort The remote host port.
      * @throws IOException If host is not reachable or I/O error.
      */
-    public ForwardServerThread(ForwardServerThreadInterface forwardClientThread, String remoteHost, int remotePort)
+    public ForwardServerThread(
+            ForwardServerThreadInterface forwardClientThread, String remoteHost, int remotePort)
             throws IOException {
         this.forwardClientThread = forwardClientThread;
         this.serverSocket = new Socket(remoteHost, remotePort);
@@ -68,19 +70,19 @@ public class ForwardServerThread extends Thread {
                     waitForMe.wait(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new PreProxyFSException("Timeout waiting for ForwardServerThread server socket.", e);
+                    throw new PreProxyFSException(
+                            "Timeout waiting for ForwardServerThread server socket.", e);
                 }
             }
         }
     }
-    
+
     /**
-     * If we have created a ForwardServerThread without destination in the
-     * construction, we must set the destination now. Attention: new socket will
-     * only be created if server socket is null.
+     * If we have created a ForwardServerThread without destination in the construction, we must set
+     * the destination now. Attention: new socket will only be created if server socket is null.
      *
      * @param hostName The remote host name.
-     * @param port     The remote host port.
+     * @param port The remote host port.
      * @throws IOException If host is not reachable or I/O error.
      */
     public void setServerSocket(String hostName, int port) throws IOException {
@@ -96,10 +98,8 @@ public class ForwardServerThread extends Thread {
             waitForMe.notifyAll();
         }
     }
-    
-    /**
-     * Forward responses to client thread.
-     */
+
+    /** Forward responses to client thread. */
     @Override
     public void run() {
         byte[] response;
@@ -123,7 +123,8 @@ public class ForwardServerThread extends Thread {
                 if (null != this.serverSocket) {
                     this.serverSocket.close();
                 }
-                if (null != this.forwardClientThread && null != this.forwardClientThread.getClientSocket()) {
+                if (null != this.forwardClientThread
+                        && null != this.forwardClientThread.getClientSocket()) {
                     this.forwardClientThread.getClientSocket().close();
                 }
             } catch (IOException e) {

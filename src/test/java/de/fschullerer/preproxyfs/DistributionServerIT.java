@@ -5,9 +5,6 @@ import static org.mockito.Mockito.when;
 
 import com.github.markusbernhardt.proxy.selector.pac.JavaxPacScriptParser;
 import com.github.markusbernhardt.proxy.selector.pac.ProxyEvaluationException;
-import de.fschullerer.preproxyfs.DirectForwardServer;
-import de.fschullerer.preproxyfs.DistributeServer;
-import de.fschullerer.preproxyfs.PreProxyFS;
 import de.fschullerer.preproxyfs.testutil.PacScriptSourceString;
 import de.fschullerer.preproxyfs.testutil.ServerSocketThread;
 import de.fschullerer.preproxyfs.testutil.UtilT;
@@ -22,14 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DistributionServerIT {
 
-    @Mock
-    DirectForwardServer mockDirectForwardServer;
+    @Mock DirectForwardServer mockDirectForwardServer;
 
     @Test
     @Tag("IntegrationTest")
-    @DisplayName("DSIT001: Assert that DistributeServer will correctly forward requests to remote servers.")
+    @DisplayName(
+            "DSIT001: Assert that DistributeServer will correctly forward requests to remote servers.")
     void assertForward1() throws ProxyEvaluationException, IOException {
-        // create a helper endpoint-proxy that will read the forwarded request 
+        // create a helper endpoint-proxy that will read the forwarded request
         ServerSocketThread testingServer = new ServerSocketThread();
         testingServer.start();
         int proxyReaderPort = testingServer.getPort();
@@ -47,7 +44,8 @@ class DistributionServerIT {
         PacScriptSourceString pacScript = new PacScriptSourceString(UtilT.PAC_SCRIPT_1);
         PreProxyFS.setPacScriptParser(new JavaxPacScriptParser(pacScript));
         // a sample GET request with the helper proxy port as endpoint
-        String originalRequest = "GET / HTTP/1.1\r\nHost: localhost:" + proxyReaderPort + "\r\nUser-agent:foo\r\n";
+        String originalRequest =
+                "GET / HTTP/1.1\r\nHost: localhost:" + proxyReaderPort + "\r\nUser-agent:foo\r\n";
         // send request to DistributeServer for distribution
         int distributeServerLocalPort = distributeServer.getPort();
         UtilT.simpleWriteToSocket("localhost", distributeServerLocalPort, originalRequest);
@@ -55,8 +53,8 @@ class DistributionServerIT {
         String requestRead = testingServer.getMessagesReceived();
         testingServer.closeSocket();
         distributeServer.getServerSocket().close();
-        assertThat(originalRequest).as("Input and output should be the same!").isEqualTo(requestRead);
+        assertThat(originalRequest)
+                .as("Input and output should be the same!")
+                .isEqualTo(requestRead);
     }
-
-
 }

@@ -1,13 +1,13 @@
 package de.fschullerer.preproxyfs;
 
 /**
- * This is a custom unchecked exception. 
+ * This is a custom unchecked exception.
  *
  * @author Frank Schullerer
  */
 public class PreProxyFSException extends RuntimeException {
 
-    /**  Serializable. */
+    /** Serializable. */
     private static final long serialVersionUID = 1L;
 
     /**

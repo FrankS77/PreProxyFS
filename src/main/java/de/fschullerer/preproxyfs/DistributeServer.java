@@ -8,11 +8,9 @@ import java.net.SocketException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * Permanent running thread.
- * Distribute incoming requests on {@link #localBindPort} to {@link ProxyForwardServer}
- * or direct connection {@link DirectForwardServer}.
+ * Permanent running thread. Distribute incoming requests on {@link #localBindPort} to {@link
+ * ProxyForwardServer} or direct connection {@link DirectForwardServer}.
  *
  * @author Frank Schullerer
  */
@@ -24,8 +22,8 @@ public class DistributeServer extends Thread {
     private ServerSocket serverSocketD;
 
     /**
-     * Create a new DistributeServer and bind the server socket to the given port.
-     * Attention: the port must not be in use.
+     * Create a new DistributeServer and bind the server socket to the given port. Attention: the
+     * port must not be in use.
      *
      * @param localBindPort Local bind port.
      */
@@ -50,7 +48,8 @@ public class DistributeServer extends Thread {
                     waitForMe.wait(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new PreProxyFSException("Timeout waiting for server socket. Should not happen.", e);
+                    throw new PreProxyFSException(
+                            "Timeout waiting for server socket. Should not happen.", e);
                 }
             }
         }
@@ -67,11 +66,11 @@ public class DistributeServer extends Thread {
     }
 
     /**
-     * Starts the distribute forward server - binds on a given port and starts serving.
-     * Create 2 threads for every connection requests incoming. Create one client thread
-     * to read requests from client socket and send them to the correct local socket ->
-     * proxy: {@link ProxyForwardServer} or direct connection {@link DirectForwardServer}
-     * The two threads live only for the communication time.
+     * Starts the distribute forward server - binds on a given port and starts serving. Create 2
+     * threads for every connection requests incoming. Create one client thread to read requests
+     * from client socket and send them to the correct local socket -> proxy: {@link
+     * ProxyForwardServer} or direct connection {@link DirectForwardServer} The two threads live
+     * only for the communication time.
      */
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
@@ -87,24 +86,30 @@ public class DistributeServer extends Thread {
                 // Accept client connections and process them until stopped
                 // clientSocket is closed in ClientThread
                 Socket clientSocket = serverSocket.accept();
-                DistributeForwardClientThread clientForward = new DistributeForwardClientThread(clientSocket);
+                DistributeForwardClientThread clientForward =
+                        new DistributeForwardClientThread(clientSocket);
                 // bind the two threads together
                 ForwardServerThread serverForward = new ForwardServerThread(clientForward);
                 clientForward.setForwardServerThread(serverForward);
-                // start only the client thread, we don't know the remote server host name/port yet. 
+                // start only the client thread, we don't know the remote server host name/port yet.
                 clientForward.start();
             }
         } catch (BindException e) {
             throw new PreProxyFSException(
-                    "Unable to bind DirectForwardServer to local port " + localBindPort + " Program exit.", e);
+                    "Unable to bind DirectForwardServer to local port "
+                            + localBindPort
+                            + " Program exit.",
+                    e);
         } catch (SocketException e) {
             if (e.getMessage().equals("Socket closed")) {
                 LOGGER.info("Closing DistributeServer socket");
             } else {
-                throw new PreProxyFSException("Error creating DistributeServer socket, Program exit.", e);
+                throw new PreProxyFSException(
+                        "Error creating DistributeServer socket, Program exit.", e);
             }
         } catch (IOException e) {
-            throw new PreProxyFSException("Error creating DistributeServer socket, Program exit.", e);
+            throw new PreProxyFSException(
+                    "Error creating DistributeServer socket, Program exit.", e);
         }
     }
 }

@@ -3,8 +3,7 @@ package de.fschullerer.preproxyfs.testutil;
 import com.github.markusbernhardt.proxy.selector.pac.PacScriptSource;
 
 /**
- * Only needed for testing.
- * Set PAC as string within a PacScriptSource.
+ * Only needed for testing. Set PAC as string within a PacScriptSource.
  *
  * @author Frank Schullerer
  */
