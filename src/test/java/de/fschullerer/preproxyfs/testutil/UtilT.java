@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class.
@@ -13,6 +15,9 @@ import java.nio.file.Path;
  * @author Frank Schullerer
  */
 public class UtilT {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UtilT.class.getName());
+
     public static final String REMOTE_SERVER_ENDPOINT1 = "corp.example1.com";
     public static final String REMOTE_SERVER_ENDPOINT2 = "corp.example2.com";
     public static final String REMOTE_SERVER_ENDPOINT2_PORT = REMOTE_SERVER_ENDPOINT2 + ":8090";
@@ -81,5 +86,19 @@ public class UtilT {
         Files.write(path, content.getBytes(StandardCharsets.UTF_8));
         file.deleteOnExit();
         return file.getAbsolutePath();
+    }
+
+    /**
+     * Let the current thread wait for x milliseconds.
+     *
+     * @param millis Wait time in milliseconds.
+     */
+    public static void sleep(int millis) {
+        try {
+            Thread.currentThread().sleep(millis);
+        } catch (InterruptedException e) {
+            LOGGER.trace("Error while waiting!", e);
+            Thread.currentThread().interrupt();
+        }
     }
 }

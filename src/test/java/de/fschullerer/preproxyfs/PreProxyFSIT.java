@@ -47,9 +47,11 @@ class PreProxyFSIT {
                         + ";\"} return \"DIRECT\";}";
         String pathToPACScript = UtilT.createTempPropFile(pac2);
         PreProxyFS.startPreProxyFS(pathToPACScript, PreProxyFS.DEFAULT_LOCAL_BIND_PORT, null);
+        // wait for fully startup
+        UtilT.sleep(2000);
     }
 
-    // @Test
+    @Test
     @Tag("IntegrationTest")
     @DisplayName("PREFSIT001: Assert that request to main port is forwarded to 1. proxy.")
     void assertPreFSIT1() throws IOException {
@@ -62,7 +64,7 @@ class PreProxyFSIT {
         assertThat(proxy1Req).as("Input and output should be the same!").isEqualTo(proxy1Received);
     }
 
-    // @Test
+    @Test
     @Tag("IntegrationTest")
     @DisplayName("PREFSIT002: Assert that request to main port is forwarded to 2. proxy.")
     void assertPreFSIT2() throws IOException {
