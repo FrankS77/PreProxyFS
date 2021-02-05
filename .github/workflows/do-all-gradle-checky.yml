@@ -1,0 +1,19 @@
+name: Do all checks (sonarlint, formatting, unit tests)
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1.4.2
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        with:
+          java-version: 1.8
+      - name: All checks
+        run: ./gradlew check
