@@ -10,11 +10,11 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
     id 'application'
     id 'java-library'
-    id 'org.ajoberstar.grgit' version '1.7.2'
-    id 'org.mikeneck.graalvm-native-image' version 'v1.0.2'
-    id 'name.remal.sonarlint' version '1.2.2'
+    id 'org.ajoberstar.grgit' version '4.1.1'
+    id 'org.mikeneck.graalvm-native-image' version 'v1.4.1'
+    id 'name.remal.sonarlint' version '1.5.0'
     id 'checkstyle'
-    id "com.diffplug.spotless" version "5.9.0"
+    id "com.diffplug.spotless" version "6.1.0"
     id 'jacoco'
     id 'distribution'
 }
@@ -28,7 +28,6 @@ targetCompatibility = javaVersion
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -49,6 +48,7 @@ dependencies {
     testImplementation 'org.junit.platform:junit-platform-suite-api:1.7.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:3.6.28'
     testImplementation 'org.assertj:assertj-core:3.18.1'
+    testImplementation 'org.awaitility:awaitility:4.1.1'
 }
 
 jacocoTestReport {
@@ -101,7 +101,7 @@ task sourcesJar(type: Jar, dependsOn:classes) {
     from sourceSets.main.java
     archiveClassifier = 'sources'
     manifest {
-        attributes 'Implementation-Title': project.name, 'Implementation-Version': version
+        attributes 'Implementation-Title': project.name, 'Implementation-Version': archiveVersion
     }
 }
 
@@ -113,7 +113,7 @@ jar {
     doFirst {
         manifest {
             attributes 'Implementation-Title': project.name,
-                    'Implementation-Version': version,
+                    'Implementation-Version': archiveVersion,
                     'Main-Class': application.mainClass,
                     'Built-Gradle': gradle.gradleVersion,
                     'Built-Host': java.net.InetAddress.getLocalHost().getHostName(),
