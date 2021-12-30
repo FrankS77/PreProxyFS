@@ -77,6 +77,8 @@ public class DistributeServer extends Thread {
     public void run() {
         // Bind server on given TCP port
         try (ServerSocket serverSocket = new ServerSocket(localBindPort)) {
+            // set hard connection timeout
+            serverSocket.setSoTimeout(Util.SOCKET_CONN_TIMEOUT);
             this.serverSocketD = serverSocket;
             LOGGER.info("Start DistributeServer on TCP port: {}", getPort());
             synchronized (waitForMe) {

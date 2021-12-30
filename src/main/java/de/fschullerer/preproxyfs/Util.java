@@ -25,6 +25,13 @@ public final class Util {
 
     public static final String CONNECTION_ESTABLISHED =
             "HTTP/1.0 200 Connection established\r\n\r\n";
+    /** Global default socket connection timeout. */
+    static final int SOCKET_CONN_TIMEOUT = 30000;
+
+    /** Retry value for failed connections. */
+    static final int RETRY_FAILED = 5;
+    /** Retry wait time for failed connections in milliseconds. */
+    static final int RETRY_WAIT_TIME = 2000;
 
     /** Private constructor. */
     private Util() {
@@ -111,12 +118,32 @@ public final class Util {
     /**
      * Get the original request from client socket and reduce the byte length to the real request
      * length (with zeros until end of byte array). So request.length is always the correct length.
+     * This method contains a retry mechanism. See {@link #RETRY_FAILED} and {@link
+     * #RETRY_WAIT_TIME}
      *
      * @param socket The socket to get input stream from.
      * @return The original request.
      * @throws IOException Error getting input stream from client socket.
      */
     public static byte[] readFromClientSocket(Socket socket) throws IOException {
+        byte[] orgRequest = new byte[] {};
+        boolean failed = false;
+        for (int i = 0; i < RETRY_FAILED; i++) {
+            try {
+                orgRequest = readFromClientSocketRetry(socket);
+            } catch (IOException e) {
+                failed = true;
+                // retry every X seconds
+                sleep(RETRY_WAIT_TIME);
+            }
+            if (!failed) {
+                break;
+            }
+        }
+        return orgRequest;
+    }
+
+    private static byte[] readFromClientSocketRetry(Socket socket) throws IOException {
         byte[] newByteArray = new byte[Util.DEFAULT_BUFFER_SIZE];
         byte[] orgRequest;
         // fill new byte array.
@@ -129,6 +156,18 @@ public final class Util {
             System.arraycopy(newByteArray, 0, orgRequest, 0, requestLength);
         }
         return orgRequest;
+    }
+
+    private static void sleep(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            // do not fail but log error
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Sleep interrupted", e);
+            }
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**
