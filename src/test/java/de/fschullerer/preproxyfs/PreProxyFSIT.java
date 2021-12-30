@@ -1,11 +1,13 @@
 package de.fschullerer.preproxyfs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import de.fschullerer.preproxyfs.testutil.ClientSocketThread;
 import de.fschullerer.preproxyfs.testutil.ServerSocketThread;
 import de.fschullerer.preproxyfs.testutil.UtilT;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +50,7 @@ class PreProxyFSIT {
         String pathToPACScript = UtilT.createTempPropFile(pac2);
         PreProxyFS.startPreProxyFS(pathToPACScript, PreProxyFS.DEFAULT_LOCAL_BIND_PORT, null);
         // wait for fully startup
-        UtilT.sleep(2000);
+        await().atMost(2, TimeUnit.SECONDS);
     }
 
     @Test

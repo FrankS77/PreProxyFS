@@ -87,18 +87,4 @@ public class UtilT {
         file.deleteOnExit();
         return file.getAbsolutePath();
     }
-
-    /**
-     * Let the current thread wait for x milliseconds.
-     *
-     * @param millis Wait time in milliseconds.
-     */
-    public static void sleep(int millis) {
-        try {
-            Thread.currentThread().sleep(millis);
-        } catch (InterruptedException e) {
-            LOGGER.trace("Error while waiting!", e);
-            Thread.currentThread().interrupt();
-        }
-    }
 }
