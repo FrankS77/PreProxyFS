@@ -1,4 +1,24 @@
 
+<a name="v2022-01-10"></a>
+## [v2022-01-10](https://github.com/FrankS77/PreProxyFS/compare/2021-12-30...v2022-01-10)
+
+> 2022-01-10
+
+### Chore
+
+* Updating changelog with git-chglog
+
+### Fix
+
+* Add keep alive and remove timeout for a more stable connection
+
+
+<a name="2021-12-30"></a>
+## [2021-12-30](https://github.com/FrankS77/PreProxyFS/compare/v2021-12-30...2021-12-30)
+
+> 2021-12-30
+
+
 <a name="v2021-12-30"></a>
 ## [v2021-12-30](https://github.com/FrankS77/PreProxyFS/compare/v2021-01.29...v2021-12-30)
 
@@ -45,7 +65,13 @@
 
 
 <a name="v2021-01.29"></a>
-## [v2021-01.29](https://github.com/FrankS77/PreProxyFS/compare/v2021-01-23...v2021-01.29)
+## [v2021-01.29](https://github.com/FrankS77/PreProxyFS/compare/2021-01-29...v2021-01.29)
+
+> 2021-01-29
+
+
+<a name="2021-01-29"></a>
+## [2021-01-29](https://github.com/FrankS77/PreProxyFS/compare/2021-01-23...2021-01-29)
 
 > 2021-01-29
 
@@ -59,10 +85,37 @@
 * Fix spotbugs issues with getBytes (internationalization)
 
 
-<a name="v2021-01-23"></a>
-## v2021-01-23
+<a name="2021-01-23"></a>
+## [2021-01-23](https://github.com/FrankS77/PreProxyFS/compare/v2021-01-23...2021-01-23)
 
 > 2021-01-23
+
+
+<a name="v2021-01-23"></a>
+## [v2021-01-23](https://github.com/FrankS77/PreProxyFS/compare/2021-01-21...v2021-01-23)
+
+> 2021-01-23
+
+### Feat
+
+* GitHub workflow for native image for macOS, Linux,
+
+### Fix
+
+* native distribution test6
+* native distribution test5
+* native distribution test4
+* native distribution test3
+* native distribution test2
+* native distribution test
+* Set ACTIONS_ALLOW_UNSECURE_COMMANDS to true because setup-graalvm use this deprecated command
+* checkout is missing
+
+
+<a name="2021-01-21"></a>
+## 2021-01-21
+
+> 2021-01-21
 
 ### Chore
 
@@ -77,19 +130,7 @@
 
 ### Feat
 
-* GitHub workflow for native image for macOS, Linux,
 * initial version
-
-### Fix
-
-* native distribution test6
-* native distribution test5
-* native distribution test4
-* native distribution test3
-* native distribution test2
-* native distribution test
-* Set ACTIONS_ALLOW_UNSECURE_COMMANDS to true because setup-graalvm use this deprecated command
-* checkout is missing
 
 ### Style
 
