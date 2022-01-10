@@ -25,8 +25,6 @@ public final class Util {
 
     public static final String CONNECTION_ESTABLISHED =
             "HTTP/1.0 200 Connection established\r\n\r\n";
-    /** Global default socket connection timeout. */
-    static final int SOCKET_CONN_TIMEOUT = 30000;
 
     /** Retry value for failed connections. */
     static final int RETRY_FAILED = 5;

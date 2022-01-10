@@ -75,8 +75,6 @@ public class DirectForwardServer extends Thread {
     public void run() {
         // Bind server on a free port
         try (ServerSocket serverSocket = new ServerSocket(0)) {
-            // set hard connection timeout
-            serverSocket.setSoTimeout(Util.SOCKET_CONN_TIMEOUT);
             this.serverSocketD = serverSocket;
             LOGGER.info(
                     "Start DirectForwardServer on TCP port : {}",
@@ -87,7 +85,7 @@ public class DirectForwardServer extends Thread {
             // Accept client connections and process them until stopped
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-
+                clientSocket.setKeepAlive(true);
                 DirectForwardClientThread clientForward =
                         new DirectForwardClientThread(clientSocket);
                 ForwardServerThread serverForward = new ForwardServerThread(clientForward);

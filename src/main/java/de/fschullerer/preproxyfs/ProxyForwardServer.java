@@ -90,8 +90,6 @@ public class ProxyForwardServer extends Thread {
     public void run() {
         // Bind server on given TCP port
         try (ServerSocket serverSocket = new ServerSocket(0)) {
-            // set hard connection timeout
-            serverSocket.setSoTimeout(Util.SOCKET_CONN_TIMEOUT);
             this.serverSocketP = serverSocket;
             LOGGER.info(
                     "Start ProxyForwardServer on TCP port: {} . Connected"
@@ -106,6 +104,7 @@ public class ProxyForwardServer extends Thread {
             while (true) {
                 // clientSocket is closed in ClientThread
                 Socket clientSocket = serverSocket.accept();
+                clientSocket.setKeepAlive(true);
                 ProxyForwardClientThread clientForward = new ProxyForwardClientThread(clientSocket);
                 // bind the two threads together
                 ForwardServerThread serverForward =
