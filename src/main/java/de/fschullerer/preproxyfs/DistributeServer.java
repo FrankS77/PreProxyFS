@@ -66,6 +66,26 @@ public class DistributeServer extends Thread {
     }
 
     /**
+     * If an error occurs during creating/holding the connection -> create a new connection.
+     *
+     * @param serverSocket The created ServerSocket with local port. 
+     * @throws Exception Some failure while creating/starting clientSocket/ForwardServerThread/
+     * DistributeForwardClientThread
+     */
+    private void acceptLoop(ServerSocket serverSocket) throws Exception {
+        // Accept client connections and process them until stopped
+        // clientSocket is closed in ClientThread
+        Socket clientSocket = serverSocket.accept();
+        clientSocket.setKeepAlive(true);
+        DistributeForwardClientThread clientForward =
+                new DistributeForwardClientThread(clientSocket);
+        // bind the two threads together
+        ForwardServerThread serverForward = new ForwardServerThread(clientForward);
+        clientForward.setForwardServerThread(serverForward);
+        // start only the client thread, we don't know the remote server host name/port yet.
+        clientForward.start();
+    }
+    /**
      * Starts the distribute forward server - binds on a given port and starts serving. Create 2
      * threads for every connection requests incoming. Create one client thread to read requests
      * from client socket and send them to the correct local socket -> proxy: {@link
@@ -83,17 +103,12 @@ public class DistributeServer extends Thread {
                 waitForMe.notifyAll();
             }
             while (true) {
-                // Accept client connections and process them until stopped
-                // clientSocket is closed in ClientThread
-                Socket clientSocket = serverSocket.accept();
-                clientSocket.setKeepAlive(true);
-                DistributeForwardClientThread clientForward =
-                        new DistributeForwardClientThread(clientSocket);
-                // bind the two threads together
-                ForwardServerThread serverForward = new ForwardServerThread(clientForward);
-                clientForward.setForwardServerThread(serverForward);
-                // start only the client thread, we don't know the remote server host name/port yet.
-                clientForward.start();
+                try {
+                    acceptLoop(serverSocket);
+                } catch (Exception e) {
+                    LOGGER.info("DistributeServer acceptLoop Exception");
+                    LOGGER.trace("DistributeServer acceptLoop Exception Trace", e);
+                }
             }
         } catch (BindException e) {
             throw new PreProxyFSException(

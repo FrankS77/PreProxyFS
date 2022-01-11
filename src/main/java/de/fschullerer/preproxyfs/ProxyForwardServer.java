@@ -5,6 +5,8 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +81,38 @@ public class ProxyForwardServer extends Thread {
     }
 
     /**
+     * The random generator,
+     */
+    private static final Random generator = new Random();
+
+    public static int getRandomNumberRange(int min, int max) {
+        return generator.nextInt(max + 1 - min) + min;
+    }
+
+
+    /**
+     * If an error occurs during creating/holding the connection -> create a new connection.
+     * 
+     * @param serverSocket The created ServerSocket with local port. 
+     * @throws Exception Some failure while creating/starting clientSocket/ProxyForwardClientThread
+     */
+    private void acceptLoop(ServerSocket serverSocket) throws Exception {
+        // clientSocket is closed in ClientThread
+        Socket clientSocket = serverSocket.accept();
+        clientSocket.setSoTimeout(0);
+        clientSocket.setKeepAlive(true);
+        ProxyForwardClientThread clientForward = null;
+        clientForward = new ProxyForwardClientThread(clientSocket);
+        // bind the two threads together
+        ForwardServerThread serverForward =
+                new ForwardServerThread(
+                        clientForward, this.remoteProxyHost, this.remoteProxyPort);
+        clientForward.setForwardServerThread(serverForward);
+        clientForward.start();
+        serverForward.start();
+    }
+
+    /**
      * Starts the direct forward server - binds on a given port and starts serving. Create 2 threads
      * for every connection requests incoming. Create one client thread to read requests from client
      * socket and send them to remote server. Create forward thread to read responses from remote
@@ -102,17 +136,12 @@ public class ProxyForwardServer extends Thread {
             }
             // Accept client connections and process them until stopped
             while (true) {
-                // clientSocket is closed in ClientThread
-                Socket clientSocket = serverSocket.accept();
-                clientSocket.setKeepAlive(true);
-                ProxyForwardClientThread clientForward = new ProxyForwardClientThread(clientSocket);
-                // bind the two threads together
-                ForwardServerThread serverForward =
-                        new ForwardServerThread(
-                                clientForward, this.remoteProxyHost, this.remoteProxyPort);
-                clientForward.setForwardServerThread(serverForward);
-                clientForward.start();
-                serverForward.start();
+                try {
+                    acceptLoop(serverSocket);
+                } catch (Exception e) {
+                    LOGGER.info("ProxyForwardServer acceptLoop Exception");
+                    LOGGER.trace("ProxyForwardServer acceptLoop Exception Trace", e);
+                }
             }
         } catch (BindException e) {
             throw new PreProxyFSException(
