@@ -66,21 +66,20 @@ public class DirectForwardServer extends Thread {
     /**
      * If an error occurs during creating/holding the connection -> create a new connection.
      *
-     * @param serverSocket The created ServerSocket with local port. 
+     * @param serverSocket The created ServerSocket with local port.
      * @throws Exception Some failure while creating/starting clientSocket/ForwardServerThread
      */
     private void acceptLoop(ServerSocket serverSocket) throws Exception {
         Socket clientSocket = serverSocket.accept();
         clientSocket.setKeepAlive(true);
-        DirectForwardClientThread clientForward =
-                new DirectForwardClientThread(clientSocket);
+        DirectForwardClientThread clientForward = new DirectForwardClientThread(clientSocket);
         ForwardServerThread serverForward = new ForwardServerThread(clientForward);
         // bind the two threads together
         clientForward.setForwardServerThread(serverForward);
         // start only the client thread, we don't know the remote server host name/port yet.
         clientForward.start();
     }
-    
+
     /**
      * Starts the direct forward server - binds on a given port and starts serving. Create 2 threads
      * for every connection requests incoming. Create one client thread to read requests from client
@@ -105,7 +104,7 @@ public class DirectForwardServer extends Thread {
                 try {
                     acceptLoop(serverSocket);
                 } catch (Exception e) {
-                    LOGGER.info("DirectForwardServer acceptLoop Exception");
+                    LOGGER.info("DirectForwardServer acceptLoop Exception: " + e.getMessage());
                     LOGGER.trace("DirectForwardServer acceptLoop Exception Trace", e);
                 }
             }

@@ -68,9 +68,9 @@ public class DistributeServer extends Thread {
     /**
      * If an error occurs during creating/holding the connection -> create a new connection.
      *
-     * @param serverSocket The created ServerSocket with local port. 
+     * @param serverSocket The created ServerSocket with local port.
      * @throws Exception Some failure while creating/starting clientSocket/ForwardServerThread/
-     * DistributeForwardClientThread
+     *     DistributeForwardClientThread
      */
     private void acceptLoop(ServerSocket serverSocket) throws Exception {
         // Accept client connections and process them until stopped
@@ -85,6 +85,7 @@ public class DistributeServer extends Thread {
         // start only the client thread, we don't know the remote server host name/port yet.
         clientForward.start();
     }
+
     /**
      * Starts the distribute forward server - binds on a given port and starts serving. Create 2
      * threads for every connection requests incoming. Create one client thread to read requests
@@ -106,7 +107,7 @@ public class DistributeServer extends Thread {
                 try {
                     acceptLoop(serverSocket);
                 } catch (Exception e) {
-                    LOGGER.info("DistributeServer acceptLoop Exception");
+                    LOGGER.info("DistributeServer acceptLoop Exception: " + e.getMessage());
                     LOGGER.trace("DistributeServer acceptLoop Exception Trace", e);
                 }
             }

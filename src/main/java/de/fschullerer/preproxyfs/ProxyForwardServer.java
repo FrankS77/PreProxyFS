@@ -5,8 +5,6 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,19 +79,9 @@ public class ProxyForwardServer extends Thread {
     }
 
     /**
-     * The random generator,
-     */
-    private static final Random generator = new Random();
-
-    public static int getRandomNumberRange(int min, int max) {
-        return generator.nextInt(max + 1 - min) + min;
-    }
-
-
-    /**
      * If an error occurs during creating/holding the connection -> create a new connection.
-     * 
-     * @param serverSocket The created ServerSocket with local port. 
+     *
+     * @param serverSocket The created ServerSocket with local port.
      * @throws Exception Some failure while creating/starting clientSocket/ProxyForwardClientThread
      */
     private void acceptLoop(ServerSocket serverSocket) throws Exception {
@@ -101,12 +89,11 @@ public class ProxyForwardServer extends Thread {
         Socket clientSocket = serverSocket.accept();
         clientSocket.setSoTimeout(0);
         clientSocket.setKeepAlive(true);
-        ProxyForwardClientThread clientForward = null;
+        ProxyForwardClientThread clientForward;
         clientForward = new ProxyForwardClientThread(clientSocket);
         // bind the two threads together
         ForwardServerThread serverForward =
-                new ForwardServerThread(
-                        clientForward, this.remoteProxyHost, this.remoteProxyPort);
+                new ForwardServerThread(clientForward, this.remoteProxyHost, this.remoteProxyPort);
         clientForward.setForwardServerThread(serverForward);
         clientForward.start();
         serverForward.start();
@@ -139,7 +126,7 @@ public class ProxyForwardServer extends Thread {
                 try {
                     acceptLoop(serverSocket);
                 } catch (Exception e) {
-                    LOGGER.info("ProxyForwardServer acceptLoop Exception");
+                    LOGGER.info("ProxyForwardServer acceptLoop Exception: " + e.getMessage());
                     LOGGER.trace("ProxyForwardServer acceptLoop Exception Trace", e);
                 }
             }
