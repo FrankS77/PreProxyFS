@@ -1,4 +1,14 @@
 
+<a name="v2022-01-11"></a>
+## [v2022-01-11](https://github.com/FrankS77/PreProxyFS/compare/2022-01-10...v2022-01-11)
+
+> 2022-01-11
+
+### Fix
+
+* Create a new connection in a loop for Proxy/Direct/DistributeServer for a more stable connection
+
+
 <a name="v2022-01-10"></a>
 ## [v2022-01-10](https://github.com/FrankS77/PreProxyFS/compare/2021-12-30...v2022-01-10)
 
@@ -13,14 +23,8 @@
 * Add keep alive and remove timeout for a more stable connection
 
 
-<a name="2021-12-30"></a>
-## [2021-12-30](https://github.com/FrankS77/PreProxyFS/compare/v2021-12-30...2021-12-30)
-
-> 2021-12-30
-
-
 <a name="v2021-12-30"></a>
-## [v2021-12-30](https://github.com/FrankS77/PreProxyFS/compare/v2021-01.29...v2021-12-30)
+## [v2021-12-30](https://github.com/FrankS77/PreProxyFS/compare/2021-01-29...v2021-12-30)
 
 > 2021-12-30
 
@@ -58,20 +62,10 @@
 * enable tests
 * prevent non-functional code from being checked in
 * more unit tests
-* more unit tests
-* more unit tests
-* more unit tests
-* more unit tests
 
 
 <a name="v2021-01.29"></a>
-## [v2021-01.29](https://github.com/FrankS77/PreProxyFS/compare/2021-01-29...v2021-01.29)
-
-> 2021-01-29
-
-
-<a name="2021-01-29"></a>
-## [2021-01-29](https://github.com/FrankS77/PreProxyFS/compare/2021-01-23...2021-01-29)
+## [v2021-01.29](https://github.com/FrankS77/PreProxyFS/compare/2021-01-23...v2021-01.29)
 
 > 2021-01-29
 
